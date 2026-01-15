@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mac_app/src/components/UserCard.dart';
 
 class SideNav extends StatelessWidget {
   final Function(int) onNav;
@@ -121,74 +122,7 @@ class SideNav extends StatelessWidget {
           ),
           const Spacer(),
           // User Profile Section
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(
-                  color: isDark
-                      ? const Color(0xFF1F2937)
-                      : const Color(0xFFF3F4F6),
-                  width: 1,
-                ),
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(8),
-              child: Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      image: DecorationImage(
-                        image: NetworkImage(
-                          'https://lh3.googleusercontent.com/aida-public/AB6AXuB1XGNKGzaBMT9b0dLcV7BDfW6lhiPNJdiI_v-W1LyN1ejq74NP3WPR6EcD0Jb0NRNCjtTCsgSGWdQSAFUceddY2Vqu_ohm5RR9vUJIeGnjHNdHpmUUhVT9MTNVeadrQRI7rdezvpOYoij1TLLMvnZnJVwyflSBKxAa60NWz8iPSzGxeHsdd5vGU9TGCPOgMEJOiyUKHhNsRzsOWoXeTSugbyYAmn8sUx63CaBxGvp-8L4kwRYgX3O9xK540JFHucSZtyE2N11OR7o',
-                        ),
-                        onError: (exception, stackTrace) => Icon(Icons.person),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Marcus Johnson',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: isDark
-                                ? Colors.white
-                                : const Color(0xFF111827),
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
-                          'ID: 20248812',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: isDark
-                                ? const Color(0xFF9CA3AF)
-                                : const Color(0xFF6B7280),
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Spacer(),
-                  IconButton(
-                    onPressed: () {},
-                    icon: Icon(Icons.logout, color: Colors.redAccent),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          UserCard2()
         ],
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mac_app/src/components/RouteName.dart';
 
 class AssignmentSubmissionScreen extends StatelessWidget {
   const AssignmentSubmissionScreen({super.key});
@@ -12,7 +13,7 @@ class AssignmentSubmissionScreen extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(color: Colors.white.withOpacity(0.7)),
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(40),
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1200),
@@ -45,7 +46,7 @@ class _MainContent extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _Breadcrumbs(),
+        RouteName(),
         const SizedBox(height: 24),
         _Header(),
         const SizedBox(height: 24),

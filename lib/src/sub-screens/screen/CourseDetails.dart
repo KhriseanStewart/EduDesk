@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mac_app/src/components/BuildVideoPlayer.dart';
+import 'package:mac_app/src/components/RouteName.dart';
 import 'package:mac_app/src/components/WebView.dart';
 import 'package:mac_app/src/main/MainLayout.dart';
 
@@ -39,31 +40,7 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Breadcrumb
-          Row(
-            children: [
-              const Text(
-                'MODULE 2',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF289F91),
-                  letterSpacing: 1.2,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Icon(Icons.chevron_right, size: 16, color: Colors.grey.shade400),
-              const SizedBox(width: 8),
-              const Text(
-                'SOFTWARE & OS',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF289F91),
-                  letterSpacing: 1.2,
-                ),
-              ),
-            ],
-          ),
+          RouteName(),
           const SizedBox(height: 12),
           const Text(
             'Lesson 2.1: Understanding System Software',

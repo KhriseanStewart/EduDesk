@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mac_app/src/components/RouteName.dart';
 
 class GradesTranscriptScreen extends StatelessWidget {
   const GradesTranscriptScreen({super.key});
@@ -14,14 +15,14 @@ class GradesTranscriptScreen extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(color: Colors.white.withOpacity(0.7)),
       child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 40),
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1200),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _Breadcrumbs(),
+                RouteName(),
                 const SizedBox(height: 24),
                 _Header(),
                 const SizedBox(height: 32),

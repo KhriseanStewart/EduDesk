@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mac_app/src/components/UserCard.dart';
 import 'package:mac_app/src/main/MainLayout.dart';
 import 'package:mac_app/src/sub-screens/screen/AssignmentSubmissionScreen.dart';
 import 'package:mac_app/src/sub-screens/screen/CourseDetails.dart';
@@ -12,10 +13,60 @@ class Sublayout extends StatefulWidget {
 }
 
 class _SublayoutState extends State<Sublayout> {
+  // _ModuleSection(
+  //                     title: "Module 2: Software",
+  //                     isActive: true,
+  //                     lessons: const [
+  //                       _LessonItem(
+  //                         title: "2.1 System Software",
+  //                         isActive: true,
+  //                       ),
+  //                       _LessonItem(title: "2.2 Application Suites"),
+  //                     ],
+  //                   ),
+
+  final List<Map<String, dynamic>> modules = [
+    {
+      "title": "Module 1: Software",
+      "isActive": true,
+      "lessons": [
+        {"title": "2.1 System Software", "isActive": true},
+      ],
+    },
+    {
+      "title": "Module 2: Software",
+      "isActive": false,
+      "lessons": [
+        {"title": "2.1 System Software", "isActive": false},
+        {"title": "2.1 System Software", "isActive": false},
+      ],
+    },
+    {
+      "title": "Module 3: Software",
+      "isActive": false,
+      "lessons": [
+        {"title": "2.1 System Software", "isActive": false},
+        {"title": "2.1 System Software", "isActive": false},
+      ],
+    },
+    {
+      "title": "Module 4: Software",
+      "isActive": false,
+      "lessons": [
+        {"title": "2.1 System Software", "isActive": false},
+      ],
+    },
+  ];
+  final List<Map<String, String>> assignments = [
+    {"id": "a1", "title": "Network Troubleshooting Lab"},
+    {"id": "a2", "title": "IP Addressing Worksheet"},
+    {"id": "a3", "title": "Final Practical Assessment"},
+  ];
+
   int currentindex = 0;
+  String? selectedAssignmentId;
   @override
   Widget build(BuildContext context) {
-    print(currentindex);
     return Scaffold(
       body: Row(
         children: [
@@ -26,13 +77,23 @@ class _SublayoutState extends State<Sublayout> {
             child: Column(
               children: [
                 _buildTopHeader(index: currentindex),
+                Builder(
+                  builder: (_) {
+                    if (currentindex == 0) {
+                      return Expanded(child: CourseDetailsScreen());
+                    }
 
-                /// This MUST be Expanded or you’ll get overflow
-                currentindex == 0
-                    ? Expanded(child: CourseDetailsScreen())
-                    : currentindex == 1
-                    ? Expanded(child: AssignmentSubmissionScreen())
-                    : Expanded(child: GradesTranscriptScreen()),
+                    if (currentindex == 1) {
+                      return Expanded(
+                        child: AssignmentSubmissionScreen(
+                          // assignmentId: selectedAssignmentId,
+                        ),
+                      );
+                    }
+
+                    return Expanded(child: GradesTranscriptScreen());
+                  },
+                ),
               ],
             ),
           ),
@@ -144,55 +205,7 @@ class _SublayoutState extends State<Sublayout> {
           ),
           const SizedBox(width: 16),
           // User Profile
-          Container(
-            padding: const EdgeInsets.only(left: 16),
-            decoration: BoxDecoration(
-              border: Border(left: BorderSide(color: Colors.grey.shade300)),
-            ),
-            child: Row(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      'Andrew Thompson',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      'STUDENT ID: 88421',
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: Colors.grey.shade500,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(width: 12),
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: const Color(0xFF289F91).withOpacity(0.2),
-                      width: 2,
-                    ),
-                    image: const DecorationImage(
-                      image: NetworkImage(
-                        'https://lh3.googleusercontent.com/aida-public/AB6AXuDOV9ZqEQXNpGPLpvaModLNGhGuypdjyD8uxABTHjhUbSpFQxpgwOCH6Nyxzb3YW3H6dt4bzrV_2TShSbjrhGxv7OrL5IwewJCmtxcAe3PyVmDdauHJ0dxu5xevmY-8CbzBGkFgU6s7ryAPAdYSoYiI9JNW6VRKoRfs6MJ7UHaFNKOxmAC_miNprTdH51W3G_zwPeIvnuIKFk9i_Eft3N9r3pugXW6j2vhETNwRuXJi4FkCKqP5Z__uxZRBcIv_Q8PeGSRXP1-YP4w',
-                      ),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          UserCard(),
         ],
       ),
     );
@@ -260,40 +273,27 @@ class _SublayoutState extends State<Sublayout> {
                       ],
                     ),
                     const SizedBox(height: 32),
-                    // Module 1: Completed
-                    _ModuleSection(
-                      title: "Module 1: Hardware",
-                      isCompleted: true,
-                      lessons: const [
-                        _LessonItem(
-                          title: "1.1 What is a Computer?",
-                          isCompleted: true,
-                        ),
-                        _LessonItem(
-                          title: "1.2 Input & Output Devices",
-                          isCompleted: true,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    // Module 2: Active
-                    _ModuleSection(
-                      title: "Module 2: Software",
-                      isActive: true,
-                      lessons: const [
-                        _LessonItem(
-                          title: "2.1 System Software",
-                          isActive: true,
-                        ),
-                        _LessonItem(title: "2.2 Application Suites"),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    // Module 3: Locked
-                    _ModuleSection(
-                      title: "Module 3: Safety",
-                      isLocked: true,
-                      lessons: const [],
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 16),
+                      itemCount: modules.length,
+                      itemBuilder: (context, index) {
+                        final module = modules[index];
+                        return _ModuleSection(
+                          title: module['title'],
+                          isActive: module['isActive'],
+                          lessons: (module['lessons'] as List)
+                              .map<Widget>(
+                                (lesson) => _LessonItem(
+                                  title: lesson['title'],
+                                  isActive: lesson['isActive'] ?? false,
+                                ),
+                              )
+                              .toList(),
+                        );
+                      },
                     ),
                   ],
                 ),
