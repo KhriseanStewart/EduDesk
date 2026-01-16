@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:mac_app/src/LMS%20models/lms_models.dart';
 import 'package:mac_app/src/components/BuildVideoPlayer.dart';
 import 'package:mac_app/src/components/RouteName.dart';
 import 'package:mac_app/src/components/WebView.dart';
 import 'package:mac_app/src/main/MainLayout.dart';
 
 class CourseDetailsScreen extends StatefulWidget {
-  const CourseDetailsScreen({Key? key}) : super(key: key);
+  final Lesson lesson;
+  const CourseDetailsScreen({Key? key, required this.lesson}) : super(key: key);
 
   @override
   State<CourseDetailsScreen> createState() => _CourseDetailsScreenState();
@@ -24,7 +26,7 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
             Expanded(
               child: SingleChildScrollView(
                 hitTestBehavior: HitTestBehavior.opaque,
-                child: _buildMainContent(),
+                child: _buildMainContent(widget.lesson),
               ),
             ),
           ],
@@ -33,7 +35,7 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
     );
   }
 
-  Widget _buildMainContent() {
+  Widget _buildMainContent(Lesson lesson) {
     return Padding(
       padding: const EdgeInsets.all(40),
       child: Column(
@@ -42,8 +44,8 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
           // Breadcrumb
           RouteName(),
           const SizedBox(height: 12),
-          const Text(
-            'Lesson 2.1: Understanding System Software',
+          Text(
+            lesson.title,
             style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.w900,
@@ -52,19 +54,19 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
           ),
           const SizedBox(height: 40),
           // Video Player
-          _buildVideoPlayer(),
+          _buildVideoPlayer(widget.lesson),
           const SizedBox(height: 40),
           // Content Grid
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(flex: 2, child: _buildLessonOverview()),
+              Expanded(flex: 2, child: _buildLessonOverview(widget.lesson)),
               const SizedBox(width: 32),
               Expanded(
                 flex: 1,
                 child: Column(
                   children: [
-                    _buildDownloadsCard(),
+                    _buildDownloadsCard(widget.lesson),
                     const SizedBox(height: 24),
                     _buildHelpCard(),
                   ],
@@ -80,9 +82,8 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
     );
   }
 
-  Widget _buildVideoPlayer() {
-    final url =
-        "https://us02web.zoom.us/rec/share/QGd3bi-YIAwwAp8UI3vtG9rLDA4Z1EU2MN23mSqcwTVv3FiVHeLWZ7Qrkr7mJI6e.1dnyaNamkLNyD-_p?startTime=1755620449000";
+  Widget _buildVideoPlayer(Lesson lesson) {
+    final url = lesson.videoUrl ?? '';
     return url.contains("zoom")
         ? ZoomRecordingWebView(zoomUrl: url)
         : MouseRegion(
@@ -92,7 +93,7 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
           );
   }
 
-  Widget _buildLessonOverview() {
+  Widget _buildLessonOverview(Lesson lesson) {
     return Container(
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
@@ -109,7 +110,7 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'System software is a type of computer program that is designed to run a computer\'s hardware and application programs. If we think of the computer system as a layered architecture, the system software is the interface between the hardware and user applications.',
+            lesson.content,
             style: TextStyle(
               fontSize: 15,
               color: Colors.grey.shade700,
@@ -117,37 +118,12 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          Text(
-            'The Operating System (OS) is the best-known example of system software. The OS manages all the other programs in a computer. Other examples include firmware, BIOS, and device drivers.',
-            style: TextStyle(
-              fontSize: 15,
-              color: Colors.grey.shade700,
-              height: 1.6,
-            ),
-          ),
-          const SizedBox(height: 24),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _BulletPoint(
-                'Resource Management: Handling CPU, Memory, and Storage.',
-              ),
-              const SizedBox(height: 12),
-              _BulletPoint(
-                'Process Management: Handling multiple tasks simultaneously.',
-              ),
-              const SizedBox(height: 12),
-              _BulletPoint(
-                'Storage Management: File organization and disk access.',
-              ),
-            ],
-          ),
         ],
       ),
     );
   }
 
-  Widget _buildDownloadsCard() {
+  Widget _buildDownloadsCard(Lesson lesson) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -168,20 +144,21 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          _DownloadItem(
-            icon: Icons.picture_as_pdf,
-            iconColor: Colors.red,
-            iconBgColor: Colors.red.shade50,
-            title: 'OS_Basics.pdf',
-            subtitle: '1.2 MB • PDF',
-          ),
-          const SizedBox(height: 12),
-          _DownloadItem(
-            icon: Icons.description,
-            iconColor: Colors.blue,
-            iconBgColor: Colors.blue.shade50,
-            title: 'ICT_Terminologies.docx',
-            subtitle: '450 KB • DOCX',
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: lesson.resources.length,
+            itemBuilder: (context, index) {
+              final rrs = lesson.resources[index];
+              return _DownloadItem(
+                key: Key(rrs.id),
+                icon: rrs.icon,
+                iconBgColor: rrs.iconColor,
+                iconColor: rrs.iconColor,
+                title: rrs.title,
+                subtitle: rrs.url,
+              );
+            },
           ),
         ],
       ),

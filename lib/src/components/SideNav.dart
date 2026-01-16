@@ -10,135 +10,236 @@ class SideNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final size = MediaQuery.of(context).size;
 
-    return Container(
-      width: 288,
-      height: double.infinity,
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF111827) : Colors.white,
-        border: Border(
-          right: BorderSide(
-            color: isDark ? const Color(0xFF1F2937) : const Color(0xFFE5E7EB),
-            width: 1,
-          ),
-        ),
-      ),
-      child: Column(
-        children: [
-          // Header Section
-          Padding(
-            padding: const EdgeInsets.all(24),
+    return size.width > 760
+        ? Container(
+            width: 288,
+            height: double.infinity,
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF111827) : Colors.white,
+              border: Border(
+                right: BorderSide(
+                  color: isDark
+                      ? const Color(0xFF1F2937)
+                      : const Color(0xFFE5E7EB),
+                  width: 1,
+                ),
+              ),
+            ),
             child: Column(
               children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(
-                        Icons.school,
-                        color: Colors.white,
-                        size: 24,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                // Header Section
+                Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      Row(
                         children: [
-                          Text(
-                            'EduDesk',
-                            style: TextStyle(
-                              color: isDark
-                                  ? Colors.white
-                                  : const Color(0xFF0F181A),
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              height: 1,
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).primaryColor,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(
+                              Icons.school,
+                              color: Colors.white,
+                              size: 24,
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          const Text(
-                            'DESK PORTAL',
-                            style: TextStyle(
-                              color: Color(0xFF538893),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              letterSpacing: 1.2,
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'EduDesk',
+                                  style: TextStyle(
+                                    color: isDark
+                                        ? Colors.white
+                                        : const Color(0xFF0F181A),
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    height: 1,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                const Text(
+                                  'DESK PORTAL',
+                                  style: TextStyle(
+                                    color: Color(0xFF538893),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    letterSpacing: 1.2,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 40),
+                      // Navigation Items
+                      _NavItem(
+                        icon: Icons.dashboard,
+                        label: 'Dashboard',
+                        isActive: index == 0,
+                        isDark: isDark,
+                        onTap: () => onNav(0),
+                      ),
+                      const SizedBox(height: 8),
+                      _NavItem(
+                        icon: Icons.book,
+                        label: 'My Courses',
+                        isActive: index == 1,
+                        isDark: isDark,
+                        onTap: () => onNav(1),
+                      ),
+                      const SizedBox(height: 8),
+                      _NavItem(
+                        icon: Icons.calendar_today,
+                        label: 'Schedule',
+                        isActive: index == 2,
+                        isDark: isDark,
+                        onTap: () => onNav(2),
+                      ),
+                      const SizedBox(height: 8),
+                      _NavItem(
+                        icon: Icons.grade,
+                        label: 'Grades',
+                        isActive: index == 3,
+                        isDark: isDark,
+                        onTap: () => onNav(3),
+                      ),
+                      const SizedBox(height: 8),
+                      _NavItem(
+                        icon: Icons.support_agent,
+                        label: 'Support',
+                        isActive: index == 4,
+                        isDark: isDark,
+                        onTap: () => onNav(4),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 40),
-                // Navigation Items
-                _NavItem(
-                  icon: Icons.dashboard,
-                  label: 'Dashboard',
-                  isActive: index == 0,
-                  isDark: isDark,
-                  onTap: () => onNav(0),
-                ),
-                const SizedBox(height: 8),
-                _NavItem(
-                  icon: Icons.book,
-                  label: 'My Courses',
-                  isActive: index == 1,
-                  isDark: isDark,
-                  onTap: () => onNav(1),
-                ),
-                const SizedBox(height: 8),
-                _NavItem(
-                  icon: Icons.calendar_today,
-                  label: 'Schedule',
-                  isActive: index == 2,
-                  isDark: isDark,
-                  onTap: () => onNav(2),
-                ),
-                const SizedBox(height: 8),
-                _NavItem(
-                  icon: Icons.grade,
-                  label: 'Grades',
-                  isActive: index == 3,
-                  isDark: isDark,
-                  onTap: () => onNav(3),
-                ),
-                const SizedBox(height: 8),
-                _NavItem(
-                  icon: Icons.support_agent,
-                  label: 'Support',
-                  isActive: index == 4,
-                  isDark: isDark,
-                  onTap: () => onNav(4),
-                ),
+                const Spacer(),
+                // User Profile Section
+                UserCard2(),
               ],
             ),
-          ),
-          const Spacer(),
-          // User Profile Section
-          UserCard2()
-        ],
-      ),
-    );
+          )
+        : Container(
+            width: 128,
+            height: double.infinity,
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF111827) : Colors.white,
+              border: Border(
+                right: BorderSide(
+                  color: isDark
+                      ? const Color(0xFF1F2937)
+                      : const Color(0xFFE5E7EB),
+                  width: 1,
+                ),
+              ),
+            ),
+            child: Column(
+              children: [
+                // Header Section
+                Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).primaryColor,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(
+                              Icons.school,
+                              color: Colors.white,
+                              size: 24,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'EduDesk',
+                        style: TextStyle(
+                          color: isDark
+                              ? Colors.white
+                              : const Color(0xFF0F181A),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          height: 1,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 40),
+                      // Navigation Items
+                      _NavItem(
+                        icon: Icons.dashboard,
+                        isActive: index == 0,
+                        isDark: isDark,
+                        onTap: () => onNav(0),
+                      ),
+                      const SizedBox(height: 8),
+                      _NavItem(
+                        icon: Icons.book,
+                        isActive: index == 1,
+                        isDark: isDark,
+                        onTap: () => onNav(1),
+                      ),
+                      const SizedBox(height: 8),
+                      _NavItem(
+                        icon: Icons.calendar_today,
+                        isActive: index == 2,
+                        isDark: isDark,
+                        onTap: () => onNav(2),
+                      ),
+                      const SizedBox(height: 8),
+                      _NavItem(
+                        icon: Icons.grade,
+                        isActive: index == 3,
+                        isDark: isDark,
+                        onTap: () => onNav(3),
+                      ),
+                      const SizedBox(height: 8),
+                      _NavItem(
+                        icon: Icons.support_agent,
+                        isActive: index == 4,
+                        isDark: isDark,
+                        onTap: () => onNav(4),
+                      ),
+                    ],
+                  ),
+                ),
+                const Spacer(),
+                // User Profile Section
+                UserCard3(),
+              ],
+            ),
+          );
   }
 }
 
 class _NavItem extends StatefulWidget {
   final IconData icon;
-  final String label;
+  String? label;
   final bool isActive;
   final bool isDark;
   final VoidCallback onTap;
 
-  const _NavItem({
+  _NavItem({
     required this.icon,
-    required this.label,
+    this.label,
     required this.isActive,
     required this.isDark,
     required this.onTap,
@@ -182,7 +283,7 @@ class _NavItemState extends State<_NavItem> {
                 Icon(widget.icon, size: 24, color: textColor),
                 const SizedBox(width: 12),
                 Text(
-                  widget.label,
+                  widget.label ?? '',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,

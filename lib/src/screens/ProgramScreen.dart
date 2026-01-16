@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mac_app/src/LMS%20models/lms_models.dart';
 import 'package:mac_app/src/components/Header.dart';
+import 'package:mac_app/src/data/mockData.dart';
 import 'package:mac_app/src/sub-screens/main/SubLayout.dart';
 import 'package:mac_app/src/sub-screens/screen/CourseDetails.dart';
 
@@ -48,6 +50,7 @@ class _ProgramScreenState extends State<ProgramScreen> {
   }
 
   Widget _buildFilterBar() {
+    final size = MediaQuery.of(context).size;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -79,92 +82,93 @@ class _ProgramScreenState extends State<ProgramScreen> {
             ],
           ),
         ),
-        Row(
-          children: [
-            Text(
-              "Sort by:",
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey.shade600,
-                fontWeight: FontWeight.w500,
+        if (size.width > 920)
+          Row(
+            children: [
+              Text(
+                "Sort by:",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey.shade600,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
-            const SizedBox(width: 8),
-            DropdownButton<String>(
-              value: sortBy,
-              underline: const SizedBox(),
-              style: const TextStyle(
-                color: Color(0xFF3cc2dd),
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
+              const SizedBox(width: 8),
+              DropdownButton<String>(
+                value: sortBy,
+                underline: const SizedBox(),
+                style: const TextStyle(
+                  color: Color(0xFF3cc2dd),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+                items: const [
+                  DropdownMenuItem(
+                    value: "recent",
+                    child: Text("Recently Accessed"),
+                  ),
+                  DropdownMenuItem(
+                    value: "alphabetical",
+                    child: Text("Alphabetical"),
+                  ),
+                  DropdownMenuItem(
+                    value: "completion",
+                    child: Text("Completion %"),
+                  ),
+                ],
+                onChanged: (value) {
+                  setState(() => sortBy = value!);
+                },
               ),
-              items: const [
-                DropdownMenuItem(
-                  value: "recent",
-                  child: Text("Recently Accessed"),
-                ),
-                DropdownMenuItem(
-                  value: "alphabetical",
-                  child: Text("Alphabetical"),
-                ),
-                DropdownMenuItem(
-                  value: "completion",
-                  child: Text("Completion %"),
-                ),
-              ],
-              onChanged: (value) {
-                setState(() => sortBy = value!);
-              },
-            ),
-          ],
-        ),
+            ],
+          ),
       ],
     );
   }
 
   Widget _buildCourseGrid() {
-    return GridView.count(
-      crossAxisCount: 3,
-      crossAxisSpacing: 32,
-      mainAxisSpacing: 32,
-      childAspectRatio: 0.85,
+    final size = MediaQuery.of(context).size;
+    final module = MockData.courses;
+
+    print(size.width);
+    return GridView.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        mainAxisExtent: size.width > 605
+            ? 388
+            : size.width > 536
+            ? 425
+            : size.width > 536
+            ? 348
+            : 388,
+        crossAxisCount: size.width > 1100
+            ? 3
+            : size.width > 760
+            ? 2
+            : size.width > 538
+            ? 2
+            : 1,
+        crossAxisSpacing: 32,
+        mainAxisSpacing: 32,
+        childAspectRatio: 0.85,
+      ),
       shrinkWrap: true,
+      itemCount: module.length,
       physics: const NeverScrollableScrollPhysics(),
-      children: const [
-        _CourseCard(
-          title: "Computer Essentials",
-          instructor: "Mr. Thompson",
-          progress: 0.6,
-          completedModules: 12,
-          totalModules: 20,
-          category: "Technical",
-          categoryColor: Color(0xFF3cc2dd),
-          imageUrl:
-              'https://lh3.googleusercontent.com/aida-public/AB6AXuAxA53z9aB7WISrDl1etMSRHMKvfGTGpWvMU75TooTn8T0eDofUEfU3irNggxX6u5-4w5h0TANKKjDHQBxMn0rLe5sj8EchvPRzVCSE2XByp0fkGVs31WC6ZsH4pnrXeMMjI5lMxx2cJcix0t5P6u9EhlUnTl6Ss7hs7U-Aoq0V0z8LcaImmPr62TIlwG4QFCPmLtfo8pQ-Cn3XQTxez7f_hgVbMn1xfthPBZ8tonVVqJgHVnjn6rENTAbed7r_DKT387SpU9tPHOY',
-        ),
-        _CourseCard(
-          title: "Customer Service Excellence",
-          instructor: "Ms. Gordon",
-          progress: 0.25,
-          completedModules: 4,
-          totalModules: 16,
-          category: "Soft Skills",
-          categoryColor: Color(0xFF76b081),
-          imageUrl:
-              'https://lh3.googleusercontent.com/aida-public/AB6AXuDR4YDtwlmPYinoxLqV_8H0jiaOQO9R6O_hSY7PrvynhmMNpj3MZCBIKeNPLcX833NwSr3Nu9XRLApm5FWGW3dGBMMAnvKOAnjRuCFvAXQLR5TjTLNzYDyRh1quqzYF8S8QX9RoMGU90GLEn7qoHB1DeqlZfstcXRNxOuJSCOUEsXaNybrOQZ3KjUCabOP3F3VY4dvvuE-oUyz7siXDb_jSTVUJlBu7178TlsfeVeU9YbgCBzkn1rVchQQXKTVDuDX9Rpd0Z-Lv42M',
-        ),
-        _CourseCard(
-          title: "Occupational Health & Safety",
-          instructor: "Dr. Richards",
-          progress: 0.05,
-          completedModules: 1,
-          totalModules: 18,
-          category: "Compliance",
-          categoryColor: Color(0xFFc0a07a),
-          imageUrl:
-              'https://lh3.googleusercontent.com/aida-public/AB6AXuCU6-r-s4caYwAm4-IOLsw48Q_7Ze80PmdwKNDSb1rLFk0T5iWP62-KspESuOiFS7151Y7rxLOd___zIhDM76F1Ie407YdQc8fGGHl1ECqHbKVzivAFMA3Zs9AkhwjdjCHxISmj9MZK7mK3mEj55R1my8rr0dLmxedskUIQpXPAJhWRVfKxpKpIzOvUjcBuwcu-TjTj6jORYsNPwXeDfRkatzfwxJH-tX84QDAnMvUeSM5HEQIp9Rjd0vZbJlbKDFZ9AYE1q3q46Sg',
-        ),
-      ],
+      itemBuilder: (context, index) {
+        final mod = module[index];
+        return _CourseCard(
+          assignments: mod.assignments,
+          modules: mod.modules,
+          title: mod.title,
+          instructor: mod.instructor,
+          progress: mod.progress,
+          completedModules: mod.completedModules,
+          totalModules: mod.totalModules,
+          category: mod.category,
+          categoryColor: mod.categoryColor,
+          imageUrl: mod.imageUrl,
+        );
+      },
     );
   }
 
@@ -318,6 +322,8 @@ class _CourseCard extends StatefulWidget {
   final String category;
   final Color categoryColor;
   final String imageUrl;
+  final List<Assignment> assignments;
+  final List<Module> modules;
 
   const _CourseCard({
     required this.title,
@@ -328,6 +334,8 @@ class _CourseCard extends StatefulWidget {
     required this.category,
     required this.categoryColor,
     required this.imageUrl,
+    required this.modules,
+    required this.assignments,
   });
 
   @override
@@ -341,7 +349,18 @@ class _CourseCardState extends State<_CourseCard> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => Sublayout()));
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => Sublayout(),
+            settings: RouteSettings(
+              arguments: {
+                "assignments": widget.assignments,
+                "modules": widget.modules,
+              },
+            ),
+          ),
+        );
       },
       child: MouseRegion(
         onEnter: (_) => setState(() => isHovered = true),
@@ -434,11 +453,14 @@ class _CourseCardState extends State<_CourseCard> {
                             color: Colors.grey,
                           ),
                           const SizedBox(width: 4),
-                          Text(
-                            widget.instructor,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey.shade600,
+                          Flexible(
+                            child: Text(
+                              widget.instructor,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey.shade600,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
@@ -448,12 +470,15 @@ class _CourseCardState extends State<_CourseCard> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            "${(widget.progress * 100).toInt()}% Complete",
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
+                          Flexible(
+                            child: Text(
+                              "${(widget.progress * 100).toInt()}% Complete",
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           Text(

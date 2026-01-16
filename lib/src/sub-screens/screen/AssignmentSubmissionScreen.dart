@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:mac_app/src/LMS%20models/lms_models.dart';
 import 'package:mac_app/src/components/RouteName.dart';
 
 class AssignmentSubmissionScreen extends StatelessWidget {
-  const AssignmentSubmissionScreen({super.key});
+  final Assignment assignment;
+  const AssignmentSubmissionScreen({super.key, required this.assignment});
 
   static const primary = Color(0xFF3CC2DD);
   static const border = Color(0xFFE8F0F2);
@@ -16,17 +18,17 @@ class AssignmentSubmissionScreen extends StatelessWidget {
         padding: const EdgeInsets.all(40),
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1200),
+            constraints: BoxConstraints(maxWidth: 1200),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 /// MAIN CONTENT
-                Expanded(child: _MainContent()),
+                Expanded(child: _MainContent(assign: assignment)),
 
                 const SizedBox(width: 32),
 
                 /// SIDEBAR
-                const SizedBox(width: 320, child: _Sidebar()),
+                SizedBox(width: 320, child: _Sidebar(assign: assignment)),
               ],
             ),
           ),
@@ -41,6 +43,8 @@ class AssignmentSubmissionScreen extends StatelessWidget {
 =========================================================== */
 
 class _MainContent extends StatelessWidget {
+  final Assignment assign;
+  const _MainContent({super.key, required this.assign});
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -48,9 +52,9 @@ class _MainContent extends StatelessWidget {
       children: [
         RouteName(),
         const SizedBox(height: 24),
-        _Header(),
+        _Header(assign: assign),
         const SizedBox(height: 24),
-        _InstructionsCard(),
+        _InstructionsCard(assign: assign),
         const SizedBox(height: 24),
         _DropZone(),
         const SizedBox(height: 24),
@@ -84,6 +88,9 @@ class _Breadcrumbs extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
+  final Assignment assign;
+  const _Header({super.key, required this.assign});
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -91,25 +98,31 @@ class _Header extends StatelessWidget {
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children: [
             Text(
-              "Network Troubleshooting Lab",
-              style: TextStyle(
+              assign.title,
+              style: const TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.w900,
                 color: Color(0xFF3CC2DD),
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Row(
               children: [
-                Icon(Icons.event, size: 16, color: Color(0xFF538893)),
-                SizedBox(width: 6),
-                Text("Due: Oct 24, 2023, 11:59 PM"),
-                SizedBox(width: 16),
-                Icon(Icons.grade, size: 16, color: Color(0xFF538893)),
-                SizedBox(width: 6),
-                Text("100 Points"),
+                const Icon(Icons.event, size: 16, color: Color(0xFF538893)),
+                const SizedBox(width: 6),
+                Text(
+                  "Due: ${_formatDate(assign.dueDate)}",
+                  style: const TextStyle(color: Color(0xFF538893)),
+                ),
+                const SizedBox(width: 16),
+                const Icon(Icons.grade, size: 16, color: Color(0xFF538893)),
+                const SizedBox(width: 6),
+                Text(
+                  "${assign.totalPoints} Points",
+                  style: const TextStyle(color: Color(0xFF538893)),
+                ),
               ],
             ),
           ],
@@ -122,16 +135,23 @@ class _Header extends StatelessWidget {
       ],
     );
   }
+
+  String _formatDate(DateTime date) {
+    return "${date.month}/${date.day}/${date.year}";
+  }
 }
 
 class _InstructionsCard extends StatelessWidget {
+  final Assignment assign;
+  const _InstructionsCard({super.key, required this.assign});
+
   @override
   Widget build(BuildContext context) {
     return _Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Row(
+        children: [
+          const Row(
             children: [
               Icon(Icons.info, color: Color(0xFF3CC2DD)),
               SizedBox(width: 8),
@@ -141,11 +161,10 @@ class _InstructionsCard extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           Text(
-            "Complete the network topology troubleshooting as outlined in the module 4 handbook. "
-            "Submit the .pka file and a PDF summary report explaining the issues and solutions.",
-            style: TextStyle(color: Color(0xFF538893), height: 1.5),
+            assign.description,
+            style: const TextStyle(color: Color(0xFF538893), height: 1.5),
           ),
         ],
       ),
@@ -263,7 +282,8 @@ class _ActionButtons extends StatelessWidget {
 =========================================================== */
 
 class _Sidebar extends StatelessWidget {
-  const _Sidebar();
+  final Assignment assign;
+  const _Sidebar({super.key, required this.assign});
 
   @override
   Widget build(BuildContext context) {
@@ -272,8 +292,8 @@ class _Sidebar extends StatelessWidget {
         _Card(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
+            children: [
+              const Text(
                 "SUBMISSION STATUS",
                 style: TextStyle(
                   fontSize: 12,
@@ -281,22 +301,27 @@ class _Sidebar extends StatelessWidget {
                   color: Color(0xFF538893),
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Row(
                 children: [
-                  Icon(Icons.history_toggle_off, size: 36, color: Colors.grey),
-                  SizedBox(width: 12),
+                  const Icon(
+                    Icons.history_toggle_off,
+                    size: 36,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(width: 12),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Not Submitted",
-                        style: TextStyle(
+                        assign.isSubmitted ? "Submitted" : "Not Submitted",
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text("First attempt pending"),
+
+                      const Text("First attempt pending"),
                     ],
                   ),
                 ],

@@ -131,3 +131,45 @@ class UserCard2 extends StatelessWidget {
     );
   }
 }
+
+class UserCard3 extends StatelessWidget {
+  const UserCard3({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    Map<String, dynamic> userDetails = {
+      "name": "Khrisean Stewart",
+      "ID": "111 - 111 - 111",
+      "avatar":
+          "https://lh3.googleusercontent.com/aida-public/AB6AXuDOV9ZqEQXNpGPLpvaModLNGhGuypdjyD8uxABTHjhUbSpFQxpgwOCH6Nyxzb3YW3H6dt4bzrV_2TShSbjrhGxv7OrL5IwewJCmtxcAe3PyVmDdauHJ0dxu5xevmY-8CbzBGkFgU6s7ryAPAdYSoYiI9JNW6VRKoRfs6MJ7UHaFNKOxmAC_miNprTdH51W3G_zwPeIvnuIKFk9i_Eft3N9r3pugXW6j2vhETNwRuXJi4FkCKqP5Z__uxZRBcIv_Q8PeGSRXP1-YP4w",
+    };
+
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(color: const Color(0xFFF3F4F6), width: 1),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(0),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                image: DecorationImage(
+                  image: NetworkImage(userDetails['avatar']),
+                  onError: (exception, stackTrace) => Icon(Icons.person),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

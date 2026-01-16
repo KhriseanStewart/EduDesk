@@ -1,7 +1,10 @@
+// lib/src/screens/Dashboard.dart - UPDATED
+
 import 'package:flutter/material.dart';
+import 'package:mac_app/src/LMS%20models/lms_models.dart';
 import 'package:mac_app/src/components/CourseCard.dart';
-import 'package:mac_app/src/components/CustomContainer.dart';
 import 'package:mac_app/src/components/StickySidebar.dart';
+import 'package:mac_app/src/data/mockData.dart';
 
 class Dashboard extends StatelessWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -9,6 +12,11 @@ class Dashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final activeCourses = MockData.courses.where((c) => c.isActive).toList();
+    final announcement = MockData.announcements.firstWhere((a) => a.isPinned);
+
+    print(size.width);
+
     return Container(
       decoration: BoxDecoration(color: Colors.white.withOpacity(0.7)),
       child: Padding(
@@ -23,10 +31,12 @@ class Dashboard extends StatelessWidget {
                 child: Column(
                   children: [
                     size.width > 1302
-                        ? AnnouncementBanner(context)
+                        ? _buildAnnouncementBanner(context, announcement)
                         : const SizedBox.shrink(),
                     const SizedBox(height: 16),
-                    CurrentCourses(context, size),
+                    _buildCurrentCourses(context, size, activeCourses),
+                    const SizedBox(height: 24),
+                    _buildQuickStats(activeCourses),
                   ],
                 ),
               ),
@@ -44,114 +54,76 @@ class Dashboard extends StatelessWidget {
     );
   }
 
-  Widget AnnouncementBanner(BuildContext context) {
+  Widget _buildAnnouncementBanner(
+    BuildContext context,
+    Announcement announcement,
+  ) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFD54F).withOpacity(0.1), // accent-yellow/10
+        color: const Color(0xFFFFD54F).withOpacity(0.1),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFFFFD54F).withOpacity(0.3), // accent-yellow/30
-        ),
+        border: Border.all(color: const Color(0xFFFFD54F).withOpacity(0.3)),
       ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final isMobile = constraints.maxWidth < 768;
-
-          return Flex(
-            direction: isMobile ? Axis.vertical : Axis.horizontal,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: isMobile
-                ? CrossAxisAlignment.center
-                : CrossAxisAlignment.start,
-            children: [
-              // LEFT SIDE
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Icon circle
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFFFD54F),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.campaign,
-                        color: Color(0xFF1A2B2E),
-                        size: 26,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-
-                  // Text content
-                  Flexible(
-                    child: Column(
-                      crossAxisAlignment: isMobile
-                          ? CrossAxisAlignment.center
-                          : CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          "Kingston Campus Announcement",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.start,
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          "The main library will remain open until 10:00 PM throughout the final exam period.",
-                          style: TextStyle(fontSize: 14, color: Colors.grey),
-                          textAlign: TextAlign.start,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-
-              if (!isMobile) const SizedBox(width: 24),
-              if (isMobile) const SizedBox(height: 16),
-
-              // BUTTON
-              ElevatedButton(
-                onPressed: () {
-                  // TODO: navigate to details
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFFD54F),
-                  foregroundColor: const Color(0xFF1A2B2E),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: const BoxDecoration(
+              color: Color(0xFFFFD54F),
+              shape: BoxShape.circle,
+            ),
+            child: const Center(
+              child: Icon(Icons.campaign, color: Color(0xFF1A2B2E), size: 26),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  announcement.title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                child: const Text(
-                  "View Details",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                const SizedBox(height: 4),
+                Text(
+                  announcement.message,
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
                 ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 24),
+          ElevatedButton(
+            onPressed: () {},
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFFD54F),
+              foregroundColor: const Color(0xFF1A2B2E),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
               ),
-            ],
-          );
-        },
+            ),
+            child: const Text(
+              "View Details",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget CurrentCourses(BuildContext context, Size size) {
+  Widget _buildCurrentCourses(BuildContext context, Size size, List courses) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 10),
         const Text(
           "My Current Courses",
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
@@ -159,6 +131,7 @@ class Dashboard extends StatelessWidget {
         const SizedBox(height: 15),
         GridView.builder(
           gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+            mainAxisExtent: 300,
             crossAxisSpacing: 18,
             mainAxisSpacing: 18,
             maxCrossAxisExtent: 420,
@@ -166,15 +139,108 @@ class Dashboard extends StatelessWidget {
           ),
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: 10,
+          itemCount: courses.length,
           itemBuilder: (context, index) {
+            final course = courses[index];
             return CourseCard(
-              title: "ICT Level 1",
-              instructor: "Dr. Thompson",
-              progress: 0.75,
-              statusText: "Progressing well",
+              imageurl: course.imageUrl,
+              title: course.title,
+              instructor: course.instructor,
+              progress: course.progress,
+              statusText: course.statusText,
+              primaryColor: course.categoryColor,
             );
           },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQuickStats(List courses) {
+    final totalModules = courses.fold<int>(
+      0,
+      (int sum, c) => sum + (c.totalModules as int),
+    );
+    final completedModules = courses.fold<int>(
+      0,
+      (int sum, c) => sum + (c.completedModules as int),
+    );
+    final avgProgress = courses.isEmpty
+        ? 0.0
+        : courses.fold<double>(
+                0.0,
+                (double sum, c) => sum + (c.progress as num).toDouble(),
+              ) /
+              courses.length;
+
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Learning Progress Overview",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _StatItem(
+                label: "Total Courses",
+                value: courses.length.toString(),
+                color: const Color(0xFF4DA3B6),
+              ),
+              _StatItem(
+                label: "Modules Completed",
+                value: "$completedModules / $totalModules",
+                color: Colors.green,
+              ),
+              _StatItem(
+                label: "Avg. Progress",
+                value: "${(avgProgress * 100).toInt()}%",
+                color: Colors.orange,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatItem extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color color;
+
+  const _StatItem({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
         ),
       ],
     );

@@ -6,6 +6,7 @@ class CourseCard extends StatefulWidget {
   final double progress; // 0.0 → 1.0
   final String statusText;
   final Color primaryColor;
+  final String imageurl;
 
   const CourseCard({
     Key? key,
@@ -13,6 +14,7 @@ class CourseCard extends StatefulWidget {
     required this.instructor,
     required this.progress,
     required this.statusText,
+    required this.imageurl,
     this.primaryColor = const Color(0xFF4DA3B6),
   }) : super(key: key);
 
@@ -57,8 +59,8 @@ class _CourseCardState extends State<CourseCard> {
               borderRadius: BorderRadius.circular(12),
               child: Stack(
                 children: [
-                  Image.asset(
-                    "assets/ict.png",
+                  Image.network(
+                    widget.imageurl,
                     height: 128,
                     width: double.infinity,
                     fit: BoxFit.cover,
@@ -81,6 +83,7 @@ class _CourseCardState extends State<CourseCard> {
             Text(
               widget.title,
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              overflow: TextOverflow.ellipsis,
             ),
 
             const SizedBox(height: 4),
@@ -89,6 +92,7 @@ class _CourseCardState extends State<CourseCard> {
             Text(
               "Instructor: ${widget.instructor}",
               style: const TextStyle(fontSize: 14, color: Color(0xFF538893)),
+              overflow: TextOverflow.ellipsis,
             ),
 
             const SizedBox(height: 16),
@@ -97,19 +101,25 @@ class _CourseCardState extends State<CourseCard> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  "${(widget.progress * 100).round()}% Complete",
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
+                Flexible(
+                  child: Text(
+                    "${(widget.progress * 100).round()}% Complete",
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                Text(
-                  widget.statusText,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: widget.primaryColor,
+                Flexible(
+                  child: Text(
+                    widget.statusText,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: widget.primaryColor,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
