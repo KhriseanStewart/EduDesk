@@ -37,6 +37,8 @@ dependencies:
   video_player: ^2.10.1
   chewie: ^1.13.0
   webview_flutter: ^4.13.1
+  file_picker: ^10.3.8
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:

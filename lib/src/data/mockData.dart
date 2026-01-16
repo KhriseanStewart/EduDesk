@@ -402,6 +402,7 @@ class MockData {
       assignments: [
         // Module 1 Assignments
         Assignment(
+          isSubmitted: true,
           id: "a001",
           title: "Hardware Components Quiz",
           description: "Complete the multiple-choice assessment on computer hardware components.",
@@ -414,6 +415,7 @@ class MockData {
           lessonId: "l001",
         ),
         Assignment(
+          isSubmitted: true,
           id: "a002",
           title: "System Components Diagram",
           description: "Create a labeled diagram showing the major components of a computer system and how they interact.",
@@ -426,6 +428,7 @@ class MockData {
           lessonId: "l001",
         ),
         Assignment(
+          isSubmitted: true,
           id: "a003",
           title: "Input/Output Devices Report",
           description: "Write a brief report identifying and explaining 5 input devices and 5 output devices used in modern computing.",
@@ -438,6 +441,7 @@ class MockData {
           lessonId: "l002",
         ),
         Assignment(
+          isSubmitted: true,
           id: "a004",
           title: "Storage Technology Comparison",
           description: "Compare HDD, SSD, and cloud storage technologies. Include advantages, disadvantages, and use cases.",
@@ -452,6 +456,7 @@ class MockData {
         
         // Module 2 Assignments
         Assignment(
+          isSubmitted: true,
           id: "a005",
           title: "Operating Systems Report",
           description: "Write a comprehensive report comparing three different operating systems (Windows, macOS, Linux).",
@@ -464,6 +469,7 @@ class MockData {
           lessonId: "l004",
         ),
         Assignment(
+          isSubmitted: true,
           id: "a006",
           title: "System Software Functions Quiz",
           description: "Online quiz covering resource management, process management, and storage management.",
@@ -476,6 +482,7 @@ class MockData {
           lessonId: "l004",
         ),
         Assignment(
+          isSubmitted: true,
           id: "a007",
           title: "Application Software Case Study",
           description: "Research and present a case study on a specific application software used in your field of interest.",
@@ -488,6 +495,7 @@ class MockData {
           lessonId: "l005",
         ),
         Assignment(
+          isSubmitted: true,
           id: "a008",
           title: "OS Installation Lab Report",
           description: "Document your process of installing an operating system in a virtual machine, including screenshots and troubleshooting steps.",
@@ -502,6 +510,7 @@ class MockData {
         
         // Module 3 Assignments
         Assignment(
+          isSubmitted: true,
           id: "a009",
           title: "Network Types Comparison",
           description: "Create a comparison chart of LAN, WAN, and wireless networks including advantages and use cases.",
@@ -514,6 +523,7 @@ class MockData {
           lessonId: "l007",
         ),
         Assignment(
+          isSubmitted: true,
           id: "a010",
           title: "TCP/IP Lab Exercise",
           description: "Complete the TCP/IP configuration exercises and submit your configuration files and test results.",
@@ -526,6 +536,7 @@ class MockData {
           lessonId: "l008",
         ),
         Assignment(
+          isSubmitted: false,
           id: "a011",
           title: "Network Troubleshooting Lab",
           description: "Complete the network topology troubleshooting as outlined in the module 3 handbook. Submit the .pka file and a PDF summary report explaining the issues and solutions.",
@@ -540,6 +551,7 @@ class MockData {
         
         // Module 4 Assignments (locked)
         Assignment(
+          isSubmitted: false,
           id: "a012",
           title: "Security Threats Analysis",
           description: "Analyze three recent cybersecurity incidents and explain the vulnerabilities that were exploited.",
@@ -552,6 +564,7 @@ class MockData {
           lessonId: "l010",
         ),
         Assignment(
+          isSubmitted: false,
           id: "a013",
           title: "Encryption Implementation Project",
           description: "Implement basic encryption and decryption using provided tools. Document your process and results.",
@@ -564,6 +577,7 @@ class MockData {
           lessonId: "l011",
         ),
         Assignment(
+          isSubmitted: false,
           id: "a014",
           title: "Security Policy Development",
           description: "Develop a comprehensive security policy for a small business including malware prevention, password policies, and incident response.",

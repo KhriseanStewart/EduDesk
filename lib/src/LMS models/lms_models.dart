@@ -137,6 +137,7 @@ class ResourceFile {
 }
 
 class Assignment {
+  bool? isSubmitted;
   final String id;
   final String title;
   final String description;
@@ -150,9 +151,10 @@ class Assignment {
   final double maxFileSizeMB;
   final String courseId;
   final String moduleId;
-  final String lessonId;
+  String? lessonId;
 
   Assignment({
+    required this.isSubmitted,
     required this.id,
     required this.title,
     required this.description,
@@ -166,12 +168,14 @@ class Assignment {
     required this.maxFileSizeMB,
     required this.courseId,
     required this.moduleId,
-    required this.lessonId
+    this.lessonId,
   });
 
   bool get isOverdue =>
-      DateTime.now().isAfter(dueDate) && submissionStatus != 'submitted';
-  bool get isSubmitted => submissionStatus == 'submitted';
+      DateTime.now().isAfter(dueDate) && (submissionStatus != 'submitted');
+
+  // Renamed to avoid duplicate getter with field 'isSubmitted'
+  bool get isActuallySubmitted => submissionStatus == 'submitted';
 
   String get daysUntilDue {
     final diff = dueDate.difference(DateTime.now()).inDays;
