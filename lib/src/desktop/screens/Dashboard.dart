@@ -1,10 +1,11 @@
 // lib/src/screens/Dashboard.dart - UPDATED
 
 import 'package:flutter/material.dart';
-import 'package:mac_app/src/LMS%20models/lms_models.dart';
-import 'package:mac_app/src/components/CourseCard.dart';
-import 'package:mac_app/src/components/StickySidebar.dart';
-import 'package:mac_app/src/data/mockData.dart';
+import 'package:mac_app/src/desktop/LMS%20models/lms_models.dart';
+import 'package:mac_app/src/desktop/components/CourseCard.dart';
+import 'package:mac_app/src/desktop/components/StickySidebar.dart';
+import 'package:mac_app/src/desktop/data/mockData.dart';
+import 'package:mac_app/src/desktop/sub-screens/main/SubLayout.dart';
 
 class Dashboard extends StatelessWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -142,13 +143,30 @@ class Dashboard extends StatelessWidget {
           itemCount: courses.length,
           itemBuilder: (context, index) {
             final course = courses[index];
-            return CourseCard(
-              imageurl: course.imageUrl,
-              title: course.title,
-              instructor: course.instructor,
-              progress: course.progress,
-              statusText: course.statusText,
-              primaryColor: course.categoryColor,
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => Sublayout(),
+                    settings: RouteSettings(
+                      arguments: {
+                        "assignments": course.assignments,
+                        "modules": course.modules,
+                        "course": course,
+                      },
+                    ),
+                  ),
+                );
+              },
+              child: CourseCard(
+                imageurl: course.imageUrl,
+                title: course.title,
+                instructor: course.instructor,
+                progress: course.progress,
+                statusText: course.statusText,
+                primaryColor: course.categoryColor,
+              ),
             );
           },
         ),

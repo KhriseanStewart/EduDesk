@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mac_app/src/LMS%20models/lms_models.dart';
-import 'package:mac_app/src/components/Header.dart';
-import 'package:mac_app/src/data/mockData.dart';
-import 'package:mac_app/src/sub-screens/main/SubLayout.dart';
+import 'package:mac_app/src/desktop/LMS%20models/lms_models.dart';
+import 'package:mac_app/src/desktop/components/Header.dart';
+import 'package:mac_app/src/desktop/data/mockData.dart';
+import 'package:mac_app/src/desktop/sub-screens/main/SubLayout.dart';
 
 class ProgramScreen extends StatefulWidget {
   const ProgramScreen({Key? key}) : super(key: key);

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:mac_app/src/LMS%20models/lms_models.dart';
-import 'package:mac_app/src/components/UserCard.dart';
-import 'package:mac_app/src/main/MainLayout.dart';
-import 'package:mac_app/src/sub-screens/screen/AssignmentSubmissionScreen.dart';
-import 'package:mac_app/src/sub-screens/screen/CourseDetails.dart';
-import 'package:mac_app/src/sub-screens/screen/GradesTranscript.dart';
+import 'package:mac_app/src/desktop/LMS%20models/lms_models.dart';
+import 'package:mac_app/src/desktop/components/UserCard.dart';
+import 'package:mac_app/src/desktop/main/MainLayout.dart';
+import 'package:mac_app/src/desktop/sub-screens/screen/AssignmentSubmissionScreen.dart';
+import 'package:mac_app/src/desktop/sub-screens/screen/CourseDetails.dart';
+import 'package:mac_app/src/desktop/sub-screens/screen/GradesTranscript.dart';
+import 'package:mac_app/src/desktop/sub-screens/screen/Peoples.dart';
 
 class Sublayout extends StatefulWidget {
   const Sublayout({super.key});
@@ -37,7 +38,14 @@ class _SublayoutState extends State<Sublayout> {
     final Course? course = args['course'];
 
     if (modules.isEmpty) {
-      return const Scaffold(body: Center(child: Text('No modules available')));
+      return Scaffold(
+        body: Row(
+          children: [
+            SizedBox(width: 320, child: _buildSidebar(modules, course)),
+            Expanded(child: Center(child: Text('No modules available'))),
+          ],
+        ),
+      );
     }
 
     final Lesson defaultLesson = modules.first.lessons.first;
@@ -73,6 +81,7 @@ class _SublayoutState extends State<Sublayout> {
                       _buildTopHeader(index: currentIndex, isCompact: false),
                       Expanded(
                         child: _buildMainContent(
+                          course: course ?? null,
                           currentIndex: currentIndex,
                           selectedLesson: selectedLesson,
                           nextLesson: nextLesson,
@@ -110,6 +119,7 @@ class _SublayoutState extends State<Sublayout> {
                     _buildTopHeader(index: currentIndex, isCompact: true),
                     Expanded(
                       child: _buildMainContent(
+                        course: course ?? null,
                         currentIndex: currentIndex,
                         selectedLesson: selectedLesson,
                         nextLesson: nextLesson,
@@ -181,6 +191,7 @@ class _SublayoutState extends State<Sublayout> {
   }
 
   Widget _buildMainContent({
+    Course? course,
     required int currentIndex,
     required Lesson? selectedLesson,
     required Lesson? nextLesson,
@@ -203,6 +214,9 @@ class _SublayoutState extends State<Sublayout> {
         );
       case 2:
         return const GradesTranscriptScreen();
+
+      case 3:
+        return Peoples(users: course?.students ?? []);
       default:
         return CourseDetailsScreen(
           lesson: selectedLesson ?? nextLesson ?? defaultLesson,
@@ -275,6 +289,14 @@ class _SublayoutState extends State<Sublayout> {
             _buildNavButton(
               label: 'Grades',
               targetIndex: 2,
+              currentIndex: index,
+              primaryColor: primaryColor,
+              inactiveColor: inactiveColor,
+            ),
+            const SizedBox(width: 16),
+            _buildNavButton(
+              label: 'People',
+              targetIndex: 3,
               currentIndex: index,
               primaryColor: primaryColor,
               inactiveColor: inactiveColor,

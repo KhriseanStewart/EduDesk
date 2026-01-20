@@ -61,6 +61,12 @@ class _CourseCardState extends State<CourseCard> {
                 children: [
                   Image.network(
                     widget.imageurl,
+                    errorBuilder: (context, error, stackTrace) => Center(
+                      child: Icon(
+                        Icons.image_not_supported_outlined,
+                        size: 100,
+                      ),
+                    ),
                     height: 128,
                     width: double.infinity,
                     fit: BoxFit.cover,

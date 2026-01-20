@@ -1,19 +1,53 @@
 // lib/src/data/mock_data.dart
 
 import 'package:flutter/material.dart';
-import 'package:mac_app/src/LMS%20models/lms_models.dart';
+import 'package:mac_app/src/desktop/LMS%20models/lms_models.dart';
 
 class MockData {
-  static final User currentUser = User(
-    id: "u001",
-    name: "Khrisean Stewart",
-    studentId: "111-111-111",
-    email: "khrisean.stewart@heart.edu.jm",
-    avatarUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuDOV9ZqEQXNpGPLpvaModLNGhGuypdjyD8uxABTHjhUbSpFQxpgwOCH6Nyxzb3YW3H6dt4bzrV_2TShSbjrhGxv7OrL5IwewJCmtxcAe3PyVmDdauHJ0dxu5xevmY-8CbzBGkFgU6s7ryAPAdYSoYiI9JNW6VRKoRfs6MJ7UHaFNKOxmAC_miNprTdH51W3G_zwPeIvnuIKFk9i_Eft3N9r3pugXW6j2vhETNwRuXJi4FkCKqP5Z__uxZRBcIv_Q8PeGSRXP1-YP4w",
-    program: "ICT-2024 Program",
-  );
+  static final List<User> currentUser = [
+    User(
+      id: "u001",
+      name: "Prinz",
+      studentId: "111-111-111",
+      email: "khrisean.stewart@heart.edu.jm",
+      avatarUrl:
+          "https://lh3.googleusercontent.com/aida-public/AB6AXuDOV9ZqEQXNpGPLpvaModLNGhGuypdjyD8uxABTHjhUbSpFQxpgwOCH6Nyxzb3YW3H6dt4bzrV_2TShSbjrhGxv7OrL5IwewJCmtxcAe3PyVmDdauHJ0dxu5xevmY-8CbzBGkFgU6s7ryAPAdYSoYiI9JNW6VRKoRfs6MJ7UHaFNKOxmAC_miNprTdH51W3G_zwPeIvnuIKFk9i_Eft3N9r3pugXW6j2vhETNwRuXJi4FkCKqP5Z__uxZRBcIv_Q8PeGSRXP1-YP4w",
+      program: "ICT-2024 Program",
+      role: "student",
+    ),
+    User(
+      id: "u002",
+      name: "Khrisean",
+      studentId: "111-111-111",
+      email: "khrisean.stewart@heart.edu.jm",
+      avatarUrl:
+          "https://lh3.googleusercontent.com/aida-public/AB6AXuDOV9ZqEQXNpGPLpvaModLNGhGuypdjyD8uxABTHjhUbSpFQxpgwOCH6Nyxzb3YW3H6dt4bzrV_2TShSbjrhGxv7OrL5IwewJCmtxcAe3PyVmDdauHJ0dxu5xevmY-8CbzBGkFgU6s7ryAPAdYSoYiI9JNW6VRKoRfs6MJ7UHaFNKOxmAC_miNprTdH51W3G_zwPeIvnuIKFk9i_Eft3N9r3pugXW6j2vhETNwRuXJi4FkCKqP5Z__uxZRBcIv_Q8PeGSRXP1-YP4w",
+      program: "ICT-2024 Program",
+      role: "student",
+    ),
+    User(
+      id: "u003",
+      name: "Stewart",
+      studentId: "111-111-111",
+      email: "khrisean.stewart@heart.edu.jm",
+      avatarUrl:
+          "https://lh3.googleusercontent.com/aida-public/AB6AXuDOV9ZqEQXNpGPLpvaModLNGhGuypdjyD8uxABTHjhUbSpFQxpgwOCH6Nyxzb3YW3H6dt4bzrV_2TShSbjrhGxv7OrL5IwewJCmtxcAe3PyVmDdauHJ0dxu5xevmY-8CbzBGkFgU6s7ryAPAdYSoYiI9JNW6VRKoRfs6MJ7UHaFNKOxmAC_miNprTdH51W3G_zwPeIvnuIKFk9i_Eft3N9r3pugXW6j2vhETNwRuXJi4FkCKqP5Z__uxZRBcIv_Q8PeGSRXP1-YP4w",
+      program: "ICT-2024 Program",
+      role: "teacher",
+    ),
+    User(
+      id: "u004",
+      name: "Anthony",
+      studentId: "111-111-111",
+      email: "khrisean.stewart@heart.edu.jm",
+      avatarUrl:
+          "https://lh3.googleusercontent.com/aida-public/AB6AXuDOV9ZqEQXNpGPLpvaModLNGhGuypdjyD8uxABTHjhUbSpFQxpgwOCH6Nyxzb3YW3H6dt4bzrV_2TShSbjrhGxv7OrL5IwewJCmtxcAe3PyVmDdauHJ0dxu5xevmY-8CbzBGkFgU6s7ryAPAdYSoYiI9JNW6VRKoRfs6MJ7UHaFNKOxmAC_miNprTdH51W3G_zwPeIvnuIKFk9i_Eft3N9r3pugXW6j2vhETNwRuXJi4FkCKqP5Z__uxZRBcIv_Q8PeGSRXP1-YP4w",
+      program: "ICT-2024 Program",
+      role: "teacher",
+    ),
+  ];
 
-   static final List<Course> courses = [
+  static final List<Course> courses = [
     Course(
       id: "c001",
       title: "Introduction to ICT",
@@ -22,11 +56,13 @@ class MockData {
       instructorEmail: "thompson@heart.edu.jm",
       category: "Technical",
       categoryColor: const Color(0xFF4DA3B6),
-      imageUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuAxA53z9aB7WISrDl1etMSRHMKvfGTGpWvMU75TooTn8T0eDofUEfU3irNggxX6u5-4w5h0TANKKjDHQBxMn0rLe5sj8EchvPRzVCSE2XByp0fkGVs31WC6ZsH4pnrXeMMjI5lMxx2cJcix0t5P6u9EhlUnTl6Ss7hs7U-Aoq0V0z8LcaImmPr62TIlwG4QFCPmLtfo8pQ-Cn3XQTxez7f_hgVbMn1xfthPBZ8tonVVqJgHVnjn6rENTAbed7r_DKT387SpU9tPHOY",
+      imageUrl:
+          "https://lh3.googleusercontent.com/aida-public/AB6AXuAxA53z9aB7WISrDl1etMSRHMKvfGTGpWvMU75TooTn8T0eDofUEfU3irNggxX6u5-4w5h0TANKKjDHQBxMn0rLe5sj8EchvPRzVCSE2XByp0fkGVs31WC6ZsH4pnrXeMMjI5lMxx2cJcix0t5P6u9EhlUnTl6Ss7hs7U-Aoq0V0z8LcaImmPr62TIlwG4QFCPmLtfo8pQ-Cn3XQTxez7f_hgVbMn1xfthPBZ8tonVVqJgHVnjn6rENTAbed7r_DKT387SpU9tPHOY",
       progress: 0.75,
       completedModules: 3,
       totalModules: 4,
-      description: "Comprehensive introduction to Information and Communications Technology, covering hardware, software, networking, and digital literacy.",
+      description:
+          "Comprehensive introduction to Information and Communications Technology, covering hardware, software, networking, and digital literacy.",
       modules: [
         // MODULE 1: Computer Hardware
         Module(
@@ -39,8 +75,10 @@ class MockData {
             Lesson(
               id: "l001",
               title: "1.1 System Components",
-              content: "Learn about the fundamental components of a computer system including CPU, RAM, storage devices, and peripherals.",
-              videoUrl: "https://us02web.zoom.us/rec/share/QGd3bi-YIAwwAp8UI3vtG9rLDA4Z1EU2MN23mSqcwTVv3FiVHeLWZ7Qrkr7mJI6e.1dnyaNamkLNyD-_p",
+              content:
+                  "Learn about the fundamental components of a computer system including CPU, RAM, storage devices, and peripherals.",
+              videoUrl:
+                  "https://us02web.zoom.us/rec/share/QGd3bi-YIAwwAp8UI3vtG9rLDA4Z1EU2MN23mSqcwTVv3FiVHeLWZ7Qrkr7mJI6e.1dnyaNamkLNyD-_p",
               isCompleted: true,
               order: 1,
               durationMinutes: 45,
@@ -74,7 +112,8 @@ class MockData {
             Lesson(
               id: "l002",
               title: "1.2 Input/Output Devices",
-              content: "Explore various input and output devices and their functions in a computer system.",
+              content:
+                  "Explore various input and output devices and their functions in a computer system.",
               isCompleted: true,
               order: 2,
               durationMinutes: 30,
@@ -98,7 +137,8 @@ class MockData {
             Lesson(
               id: "l003",
               title: "1.3 Storage Technologies",
-              content: "Deep dive into storage technologies including HDD, SSD, and cloud storage solutions.",
+              content:
+                  "Deep dive into storage technologies including HDD, SSD, and cloud storage solutions.",
               isCompleted: true,
               order: 3,
               durationMinutes: 40,
@@ -121,7 +161,7 @@ class MockData {
             ),
           ],
         ),
-        
+
         // MODULE 2: Software & Operating Systems
         Module(
           id: "m002",
@@ -133,8 +173,10 @@ class MockData {
             Lesson(
               id: "l004",
               title: "2.1 System Software",
-              content: "System software is a type of computer program designed to run a computer's hardware and application programs. If we think of the computer system as a layered architecture, the system software is the interface between the hardware and user applications.",
-              videoUrl: "https://us02web.zoom.us/rec/share/QGd3bi-YIAwwAp8UI3vtG9rLDA4Z1EU2MN23mSqcwTVv3FiVHeLWZ7Qrkr7mJI6e.1dnyaNamkLNyD-_p",
+              content:
+                  "System software is a type of computer program designed to run a computer's hardware and application programs. If we think of the computer system as a layered architecture, the system software is the interface between the hardware and user applications.",
+              videoUrl:
+                  "https://us02web.zoom.us/rec/share/QGd3bi-YIAwwAp8UI3vtG9rLDA4Z1EU2MN23mSqcwTVv3FiVHeLWZ7Qrkr7mJI6e.1dnyaNamkLNyD-_p",
               isActive: true,
               order: 1,
               durationMinutes: 50,
@@ -167,7 +209,8 @@ class MockData {
             Lesson(
               id: "l005",
               title: "2.2 Application Software",
-              content: "Learn about different types of application software and their uses in various domains.",
+              content:
+                  "Learn about different types of application software and their uses in various domains.",
               order: 2,
               durationMinutes: 40,
               resources: [
@@ -190,7 +233,8 @@ class MockData {
             Lesson(
               id: "l006",
               title: "2.3 Operating System Installation",
-              content: "Hands-on guide to installing and configuring operating systems, including partitioning and dual-boot setups.",
+              content:
+                  "Hands-on guide to installing and configuring operating systems, including partitioning and dual-boot setups.",
               order: 3,
               durationMinutes: 60,
               resources: [
@@ -221,18 +265,20 @@ class MockData {
             ),
           ],
         ),
-        
+
         // MODULE 3: Networking Fundamentals
         Module(
           id: "m003",
           title: "Module 3: Networking Fundamentals",
-          description: "Introduction to computer networks and internet technologies",
+          description:
+              "Introduction to computer networks and internet technologies",
           order: 3,
           lessons: [
             Lesson(
               id: "l007",
               title: "3.1 Network Types",
-              content: "Explore different types of computer networks including LAN, WAN, and wireless networks.",
+              content:
+                  "Explore different types of computer networks including LAN, WAN, and wireless networks.",
               order: 1,
               durationMinutes: 45,
               resources: [
@@ -255,7 +301,8 @@ class MockData {
             Lesson(
               id: "l008",
               title: "3.2 TCP/IP Protocol Suite",
-              content: "Understanding the TCP/IP protocol stack and how data travels across networks.",
+              content:
+                  "Understanding the TCP/IP protocol stack and how data travels across networks.",
               order: 2,
               durationMinutes: 50,
               resources: [
@@ -287,7 +334,8 @@ class MockData {
             Lesson(
               id: "l009",
               title: "3.3 Network Troubleshooting",
-              content: "Learn essential network troubleshooting techniques and tools for diagnosing connectivity issues.",
+              content:
+                  "Learn essential network troubleshooting techniques and tools for diagnosing connectivity issues.",
               order: 3,
               durationMinutes: 55,
               resources: [
@@ -318,7 +366,7 @@ class MockData {
             ),
           ],
         ),
-        
+
         // MODULE 4: Digital Security
         Module(
           id: "m004",
@@ -330,7 +378,8 @@ class MockData {
             Lesson(
               id: "l010",
               title: "4.1 Security Threats",
-              content: "Understanding common security threats and vulnerabilities in digital systems.",
+              content:
+                  "Understanding common security threats and vulnerabilities in digital systems.",
               order: 1,
               durationMinutes: 50,
               resources: [
@@ -353,7 +402,8 @@ class MockData {
             Lesson(
               id: "l011",
               title: "4.2 Encryption & Authentication",
-              content: "Learn about encryption methods, password security, and multi-factor authentication.",
+              content:
+                  "Learn about encryption methods, password security, and multi-factor authentication.",
               order: 2,
               durationMinutes: 45,
               resources: [
@@ -376,7 +426,8 @@ class MockData {
             Lesson(
               id: "l012",
               title: "4.3 Security Best Practices",
-              content: "Comprehensive guide to implementing security best practices in personal and professional contexts.",
+              content:
+                  "Comprehensive guide to implementing security best practices in personal and professional contexts.",
               order: 3,
               durationMinutes: 40,
               resources: [
@@ -405,7 +456,8 @@ class MockData {
           isSubmitted: true,
           id: "a001",
           title: "Hardware Components Quiz",
-          description: "Complete the multiple-choice assessment on computer hardware components.",
+          description:
+              "Complete the multiple-choice assessment on computer hardware components.",
           dueDate: DateTime.now().add(const Duration(days: 2)),
           totalPoints: 50,
           acceptedFormats: ["Online Quiz"],
@@ -418,7 +470,8 @@ class MockData {
           isSubmitted: true,
           id: "a002",
           title: "System Components Diagram",
-          description: "Create a labeled diagram showing the major components of a computer system and how they interact.",
+          description:
+              "Create a labeled diagram showing the major components of a computer system and how they interact.",
           dueDate: DateTime.now().add(const Duration(days: 3)),
           totalPoints: 30,
           acceptedFormats: [".pdf", ".png", ".jpg"],
@@ -431,7 +484,8 @@ class MockData {
           isSubmitted: true,
           id: "a003",
           title: "Input/Output Devices Report",
-          description: "Write a brief report identifying and explaining 5 input devices and 5 output devices used in modern computing.",
+          description:
+              "Write a brief report identifying and explaining 5 input devices and 5 output devices used in modern computing.",
           dueDate: DateTime.now().add(const Duration(days: 4)),
           totalPoints: 40,
           acceptedFormats: [".pdf", ".docx"],
@@ -444,7 +498,8 @@ class MockData {
           isSubmitted: true,
           id: "a004",
           title: "Storage Technology Comparison",
-          description: "Compare HDD, SSD, and cloud storage technologies. Include advantages, disadvantages, and use cases.",
+          description:
+              "Compare HDD, SSD, and cloud storage technologies. Include advantages, disadvantages, and use cases.",
           dueDate: DateTime.now().add(const Duration(days: 5)),
           totalPoints: 35,
           acceptedFormats: [".pdf", ".docx"],
@@ -453,13 +508,14 @@ class MockData {
           moduleId: "m001",
           lessonId: "l003",
         ),
-        
+
         // Module 2 Assignments
         Assignment(
           isSubmitted: true,
           id: "a005",
           title: "Operating Systems Report",
-          description: "Write a comprehensive report comparing three different operating systems (Windows, macOS, Linux).",
+          description:
+              "Write a comprehensive report comparing three different operating systems (Windows, macOS, Linux).",
           dueDate: DateTime.now().add(const Duration(days: 1)),
           totalPoints: 75,
           acceptedFormats: [".pdf", ".docx"],
@@ -472,7 +528,8 @@ class MockData {
           isSubmitted: true,
           id: "a006",
           title: "System Software Functions Quiz",
-          description: "Online quiz covering resource management, process management, and storage management.",
+          description:
+              "Online quiz covering resource management, process management, and storage management.",
           dueDate: DateTime.now().add(const Duration(days: 2)),
           totalPoints: 45,
           acceptedFormats: ["Online Quiz"],
@@ -485,7 +542,8 @@ class MockData {
           isSubmitted: true,
           id: "a007",
           title: "Application Software Case Study",
-          description: "Research and present a case study on a specific application software used in your field of interest.",
+          description:
+              "Research and present a case study on a specific application software used in your field of interest.",
           dueDate: DateTime.now().add(const Duration(days: 6)),
           totalPoints: 60,
           acceptedFormats: [".pdf", ".pptx"],
@@ -498,7 +556,8 @@ class MockData {
           isSubmitted: true,
           id: "a008",
           title: "OS Installation Lab Report",
-          description: "Document your process of installing an operating system in a virtual machine, including screenshots and troubleshooting steps.",
+          description:
+              "Document your process of installing an operating system in a virtual machine, including screenshots and troubleshooting steps.",
           dueDate: DateTime.now().add(const Duration(days: 8)),
           totalPoints: 80,
           acceptedFormats: [".pdf", ".docx"],
@@ -507,13 +566,14 @@ class MockData {
           moduleId: "m002",
           lessonId: "l006",
         ),
-        
+
         // Module 3 Assignments
         Assignment(
           isSubmitted: true,
           id: "a009",
           title: "Network Types Comparison",
-          description: "Create a comparison chart of LAN, WAN, and wireless networks including advantages and use cases.",
+          description:
+              "Create a comparison chart of LAN, WAN, and wireless networks including advantages and use cases.",
           dueDate: DateTime.now().add(const Duration(days: 7)),
           totalPoints: 50,
           acceptedFormats: [".pdf", ".xlsx", ".docx"],
@@ -526,7 +586,8 @@ class MockData {
           isSubmitted: true,
           id: "a010",
           title: "TCP/IP Lab Exercise",
-          description: "Complete the TCP/IP configuration exercises and submit your configuration files and test results.",
+          description:
+              "Complete the TCP/IP configuration exercises and submit your configuration files and test results.",
           dueDate: DateTime.now().add(const Duration(days: 9)),
           totalPoints: 65,
           acceptedFormats: [".pdf", ".txt"],
@@ -539,7 +600,8 @@ class MockData {
           isSubmitted: false,
           id: "a011",
           title: "Network Troubleshooting Lab",
-          description: "Complete the network topology troubleshooting as outlined in the module 3 handbook. Submit the .pka file and a PDF summary report explaining the issues and solutions.",
+          description:
+              "Complete the network topology troubleshooting as outlined in the module 3 handbook. Submit the .pka file and a PDF summary report explaining the issues and solutions.",
           dueDate: DateTime.now().add(const Duration(days: 5)),
           totalPoints: 100,
           acceptedFormats: [".pdf", ".docx", ".pka"],
@@ -548,13 +610,14 @@ class MockData {
           moduleId: "m003",
           lessonId: "l009",
         ),
-        
+
         // Module 4 Assignments (locked)
         Assignment(
           isSubmitted: false,
           id: "a012",
           title: "Security Threats Analysis",
-          description: "Analyze three recent cybersecurity incidents and explain the vulnerabilities that were exploited.",
+          description:
+              "Analyze three recent cybersecurity incidents and explain the vulnerabilities that were exploited.",
           dueDate: DateTime.now().add(const Duration(days: 14)),
           totalPoints: 80,
           acceptedFormats: [".pdf", ".docx"],
@@ -567,7 +630,8 @@ class MockData {
           isSubmitted: false,
           id: "a013",
           title: "Encryption Implementation Project",
-          description: "Implement basic encryption and decryption using provided tools. Document your process and results.",
+          description:
+              "Implement basic encryption and decryption using provided tools. Document your process and results.",
           dueDate: DateTime.now().add(const Duration(days: 16)),
           totalPoints: 70,
           acceptedFormats: [".pdf", ".docx", ".zip"],
@@ -580,7 +644,8 @@ class MockData {
           isSubmitted: false,
           id: "a014",
           title: "Security Policy Development",
-          description: "Develop a comprehensive security policy for a small business including malware prevention, password policies, and incident response.",
+          description:
+              "Develop a comprehensive security policy for a small business including malware prevention, password policies, and incident response.",
           dueDate: DateTime.now().add(const Duration(days: 15)),
           totalPoints: 90,
           acceptedFormats: [".pdf", ".docx"],
@@ -592,8 +657,10 @@ class MockData {
       ],
       semester: "2024 Fall",
       credits: 3.0,
+      isActive: true,
+      students: ["u001", "u002", 'u003'],
     ),
-    
+
     Course(
       id: "c002",
       title: "Customer Service Excellence",
@@ -602,17 +669,19 @@ class MockData {
       instructorEmail: "gordon@heart.edu.jm",
       category: "Soft Skills",
       categoryColor: const Color(0xFF76b081),
-      imageUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuDR4YDtwlmPYinoxLqV_8H0jiaOQO9R6O_hSY7PrvynhmMNpj3MZCBIKeNPLcX833NwSr3Nu9XRLApm5FWGW3dGBMMAnvKOAnjRuCFvAXQLR5TjTLNzYDyRh1quqzYF8S8QX9RoMGU90GLEn7qoHB1DeqlZfstcXRNxOuJSCOUEsXaNybrOQZ3KjUCabOP3F3VY4dvvuE-oUyz7siXDb_jSTVUJlBu7178TlsfeVeU9YbgCBzkn1rVchQQXKTVDuDX9Rpd0Z-Lv42M",
+      imageUrl:
+          "https://lh3.googleusercontent.com/aida-public/AB6AXuDR4YDtwlmPYinoxLqV_8H0jiaOQO9R6O_hSY7PrvynhmMNpj3MZCBIKeNPLcX833NwSr3Nu9XRLApm5FWGW3dGBMMAnvKOAnjRuCFvAXQLR5TjTLNzYDyRh1quqzYF8S8QX9RoMGU90GLEn7qoHB1DeqlZfstcXRNxOuJSCOUEsXaNybrOQZ3KjUCabOP3F3VY4dvvuE-oUyz7siXDb_jSTVUJlBu7178TlsfeVeU9YbgCBzkn1rVchQQXKTVDuDX9Rpd0Z-Lv42M",
       progress: 0.25,
       completedModules: 1,
       totalModules: 4,
-      description: "Develop essential customer service skills for professional workplace environments.",
+      description:
+          "Develop essential customer service skills for professional workplace environments.",
       modules: [],
       assignments: [],
       semester: "2024 Fall",
       credits: 2.0,
     ),
-    
+
     Course(
       id: "c003",
       title: "Occupational Health & Safety",
@@ -621,11 +690,13 @@ class MockData {
       instructorEmail: "richards@heart.edu.jm",
       category: "Compliance",
       categoryColor: const Color(0xFFc0a07a),
-      imageUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuCU6-r-s4caYwAm4-IOLsw48Q_7Ze80PmdwKNDSb1rLFk0T5iWP62-KspESuOiFS7151Y7rxLOd___zIhDM76F1Ie407YdQc8fGGHl1ECqHbKVzivAFMA3Zs9AkhwjdjCHxISmj9MZK7mK3mEj55R1my8rr0dLmxedskUIQpXPAJhWRVfKxpKpIzOvUjcBuwcu-TjTj6jORYsNPwXeDfRkatzfwxJH-tX84QDAnMvUeSM5HEQIp9Rjd0vZbJlbKDFZ9AYE1q3q46Sg",
+      imageUrl:
+          "https://lh3.googleusercontent.com/aida-public/AB6AXuCU6-r-s4caYwAm4-IOLsw48Q_7Ze80PmdwKNDSb1rLFk0T5iWP62-KspESuOiFS7151Y7rxLOd___zIhDM76F1Ie407YdQc8fGGHl1ECqHbKVzivAFMA3Zs9AkhwjdjCHxISmj9MZK7mK3mEj55R1my8rr0dLmxedskUIQpXPAJhWRVfKxpKpIzOvUjcBuwcu-TjTj6jORYsNPwXeDfRkatzfwxJH-tX84QDAnMvUeSM5HEQIp9Rjd0vZbJlbKDFZ9AYE1q3q46Sg",
       progress: 0.05,
       completedModules: 0,
       totalModules: 6,
-      description: "Learn workplace safety protocols and occupational health standards.",
+      description:
+          "Learn workplace safety protocols and occupational health standards.",
       modules: [],
       assignments: [],
       semester: "2024 Fall",
@@ -735,14 +806,16 @@ class MockData {
     Announcement(
       id: "ann001",
       title: "Kingston Campus Announcement",
-      message: "The main library will remain open until 10:00 PM throughout the final exam period.",
+      message:
+          "The main library will remain open until 10:00 PM throughout the final exam period.",
       postedDate: DateTime.now().subtract(const Duration(hours: 2)),
       isPinned: true,
     ),
     Announcement(
       id: "ann002",
       title: "ICT Lab Maintenance",
-      message: "Computer Lab B will be closed for maintenance on Friday, October 27th.",
+      message:
+          "Computer Lab B will be closed for maintenance on Friday, October 27th.",
       postedDate: DateTime.now().subtract(const Duration(days: 1)),
     ),
   ];

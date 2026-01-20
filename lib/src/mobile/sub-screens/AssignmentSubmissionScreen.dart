@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mac_app/src/LMS%20models/lms_models.dart';
-import 'package:mac_app/src/components/RouteName.dart';
+import 'package:mac_app/src/desktop/LMS%20models/lms_models.dart';
+import 'package:mac_app/src/desktop/components/RouteName.dart';
 import 'package:file_picker/file_picker.dart';
 
 class AssignmentSubmissionScreen extends StatefulWidget {

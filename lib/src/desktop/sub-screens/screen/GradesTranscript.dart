@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mac_app/src/components/RouteName.dart';
+import 'package:mac_app/src/desktop/components/RouteName.dart';
 
 class GradesTranscriptScreen extends StatelessWidget {
   const GradesTranscriptScreen({super.key});

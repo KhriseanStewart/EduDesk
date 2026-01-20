@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mac_app/src/components/UserCard.dart';
+import 'package:mac_app/src/desktop/LMS%20models/lms_models.dart';
+import 'package:mac_app/src/desktop/components/UserCard.dart';
 
 class SideNav extends StatelessWidget {
   final Function(int) onNav;
@@ -9,6 +10,15 @@ class SideNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final User user = User(
+      role: "teacher",
+      id: "1",
+      name: "Khrisean Prinz",
+      studentId: "111-111-111",
+      email: "stewartkhrisean8@gmail.com",
+      avatarUrl: "",
+      program: "",
+    );
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final size = MediaQuery.of(context).size;
 
@@ -125,6 +135,17 @@ class SideNav extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
+                if (user.role == "teacher")
+                  Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: _NavItem(
+                      icon: Icons.add_moderator_outlined,
+                      isActive: index == 5,
+                      isDark: isDark,
+                      onTap: () => onNav(5),
+                      label: "Teacher Panel",
+                    ),
+                  ),
                 // User Profile Section
                 UserCard2(),
               ],
@@ -222,6 +243,17 @@ class SideNav extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
+                if (user.role == "teacher")
+                  Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: _NavItem(
+                      icon: Icons.add_moderator_outlined,
+                      isActive: index == 5,
+                      isDark: isDark,
+                      onTap: () => onNav(5),
+                      // label: "Teacher Panel",
+                    ),
+                  ),
                 // User Profile Section
                 UserCard3(),
               ],

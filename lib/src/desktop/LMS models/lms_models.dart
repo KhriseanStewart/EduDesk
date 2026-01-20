@@ -9,8 +9,10 @@ class User {
   final String email;
   final String avatarUrl;
   final String program;
+  final String role;
 
   User({
+    required this.role,
     required this.id,
     required this.name,
     required this.studentId,
@@ -39,6 +41,7 @@ class Course {
   final double credits;
   final String? grade;
   final bool isActive;
+  final List<String>? students;
 
   Course({
     required this.id,
@@ -59,6 +62,7 @@ class Course {
     required this.credits,
     this.grade,
     this.isActive = true,
+    this.students
   });
 
   String get statusText {
