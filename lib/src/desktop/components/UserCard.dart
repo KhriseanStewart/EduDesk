@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'Avatar.dart';
 
 class UserCard extends StatelessWidget {
   const UserCard({super.key});
@@ -8,8 +11,7 @@ class UserCard extends StatelessWidget {
     Map<String, dynamic> userDetails = {
       "name": "Khrisean Stewart",
       "ID": "111 - 111 - 111",
-      "avatar":
-          "https://lh3.googleusercontent.com/aida-public/AB6AXuDOV9ZqEQXNpGPLpvaModLNGhGuypdjyD8uxABTHjhUbSpFQxpgwOCH6Nyxzb3YW3H6dt4bzrV_2TShSbjrhGxv7OrL5IwewJCmtxcAe3PyVmDdauHJ0dxu5xevmY-8CbzBGkFgU6s7ryAPAdYSoYiI9JNW6VRKoRfs6MJ7UHaFNKOxmAC_miNprTdH51W3G_zwPeIvnuIKFk9i_Eft3N9r3pugXW6j2vhETNwRuXJi4FkCKqP5Z__uxZRBcIv_Q8PeGSRXP1-YP4w",
+      "avatar": "",
     };
     return Container(
       padding: const EdgeInsets.only(left: 16),
@@ -37,22 +39,10 @@ class UserCard extends StatelessWidget {
             ],
           ),
           const SizedBox(width: 12),
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: const Color(0xFF289F91).withOpacity(0.2),
-                width: 2,
-              ),
-              image: DecorationImage(
-                image: NetworkImage(userDetails['avatar']),
-                fit: BoxFit.cover,
-                onError: (exception, stackTrace) =>
-                    Icon(Icons.person, size: 30),
-              ),
-            ),
+          Avatar(
+            imageUrl: userDetails['avatar'] as String?,
+            name: userDetails['name'] as String?,
+            size: 40,
           ),
         ],
       ),
@@ -65,12 +55,10 @@ class UserCard2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Map<String, dynamic> userDetails = {
-      "name": "Khrisean Stewart",
-      "ID": "111 - 111 - 111",
-      "avatar":
-          "https://lh3.googleusercontent.com/aida-public/AB6AXuDOV9ZqEQXNpGPLpvaModLNGhGuypdjyD8uxABTHjhUbSpFQxpgwOCH6Nyxzb3YW3H6dt4bzrV_2TShSbjrhGxv7OrL5IwewJCmtxcAe3PyVmDdauHJ0dxu5xevmY-8CbzBGkFgU6s7ryAPAdYSoYiI9JNW6VRKoRfs6MJ7UHaFNKOxmAC_miNprTdH51W3G_zwPeIvnuIKFk9i_Eft3N9r3pugXW6j2vhETNwRuXJi4FkCKqP5Z__uxZRBcIv_Q8PeGSRXP1-YP4w",
-    };
+    final user = Supabase.instance.client.auth.currentUser;
+    final name = user?.userMetadata?['name'] as String? ?? user?.email ?? 'User';
+    final email = user?.email ?? '';
+    final avatarUrl = user?.userMetadata?['avatar_url'] as String?;
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -83,17 +71,10 @@ class UserCard2 extends StatelessWidget {
         padding: const EdgeInsets.all(8),
         child: Row(
           children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                image: DecorationImage(
-                  image: NetworkImage(userDetails['avatar']),
-                  onError: (exception, stackTrace) => Icon(Icons.person),
-                  fit: BoxFit.cover,
-                ),
-              ),
+            Avatar(
+              imageUrl: avatarUrl,
+              name: name,
+              size: 40,
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -101,29 +82,31 @@ class UserCard2 extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    userDetails['name'],
-                    style: TextStyle(
+                    name,
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF111827),
+                      color: Color(0xFF111827),
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    'ID: ${userDetails['ID']}',
-                    style: TextStyle(
+                    email,
+                    style: const TextStyle(
                       fontSize: 12,
-                      color: const Color(0xFF6B7280),
+                      color: Color(0xFF6B7280),
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
             ),
-            Spacer(),
             IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.logout, color: Colors.redAccent),
+              onPressed: () async {
+                await Supabase.instance.client.auth.signOut();
+              },
+              icon: Icon(Icons.logout, color: Colors.red.shade700),
+              tooltip: 'Sign out',
             ),
           ],
         ),
@@ -140,8 +123,7 @@ class UserCard3 extends StatelessWidget {
     Map<String, dynamic> userDetails = {
       "name": "Khrisean Stewart",
       "ID": "111 - 111 - 111",
-      "avatar":
-          "https://lh3.googleusercontent.com/aida-public/AB6AXuDOV9ZqEQXNpGPLpvaModLNGhGuypdjyD8uxABTHjhUbSpFQxpgwOCH6Nyxzb3YW3H6dt4bzrV_2TShSbjrhGxv7OrL5IwewJCmtxcAe3PyVmDdauHJ0dxu5xevmY-8CbzBGkFgU6s7ryAPAdYSoYiI9JNW6VRKoRfs6MJ7UHaFNKOxmAC_miNprTdH51W3G_zwPeIvnuIKFk9i_Eft3N9r3pugXW6j2vhETNwRuXJi4FkCKqP5Z__uxZRBcIv_Q8PeGSRXP1-YP4w",
+      "avatar": "",
     };
 
     return Container(
@@ -155,17 +137,10 @@ class UserCard3 extends StatelessWidget {
         padding: const EdgeInsets.all(0),
         child: Row(
           children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                image: DecorationImage(
-                  image: NetworkImage(userDetails['avatar']),
-                  onError: (exception, stackTrace) => Icon(Icons.person),
-                  fit: BoxFit.cover,
-                ),
-              ),
+            Avatar(
+              imageUrl: userDetails['avatar'] as String?,
+              name: userDetails['name'] as String?,
+              size: 40,
             ),
           ],
         ),

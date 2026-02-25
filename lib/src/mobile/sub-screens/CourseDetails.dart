@@ -27,7 +27,7 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
     setState(() {
       isCompleted = !isCompleted;
     });
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -37,13 +37,15 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
               color: Colors.white,
             ),
             const SizedBox(width: 12),
-            Text(isCompleted 
-                ? 'Lesson marked as complete!' 
-                : 'Lesson marked as incomplete'),
+            Text(
+              isCompleted
+                  ? 'Lesson marked as complete!'
+                  : 'Lesson marked as incomplete',
+            ),
           ],
         ),
         backgroundColor: isCompleted ? Colors.green : Colors.orange,
-        behavior: SnackBarBehavior.floating,
+        // behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 2),
       ),
     );
@@ -109,9 +111,7 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
-      body: SingleChildScrollView(
-        child: _buildMainContent(widget.lesson),
-      ),
+      body: SingleChildScrollView(child: _buildMainContent(widget.lesson)),
     );
   }
 
@@ -123,7 +123,6 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Breadcrumb
               RouteName(),
               const SizedBox(height: 12),
               Text(
@@ -135,20 +134,17 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              
+
               // Video Player
               _buildVideoPlayer(lesson),
               const SizedBox(height: 32),
-              
+
               // Content Grid - Responsive
               if (constraints.maxWidth > 900)
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      flex: 2,
-                      child: _buildLessonOverview(lesson),
-                    ),
+                    Expanded(flex: 2, child: _buildLessonOverview(lesson)),
                     const SizedBox(width: 32),
                     Expanded(
                       flex: 1,
@@ -172,7 +168,7 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
                     _buildHelpCard(),
                   ],
                 ),
-              
+
               const SizedBox(height: 40),
               // Bottom Navigation
               _buildBottomNavigation(),
@@ -185,7 +181,7 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
 
   Widget _buildVideoPlayer(Lesson lesson) {
     final url = lesson.videoUrl ?? '';
-    
+
     if (url.isEmpty) {
       return Container(
         height: 400,
@@ -201,17 +197,14 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
               const SizedBox(height: 16),
               Text(
                 'No video available for this lesson',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey.shade600,
-                ),
+                style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
               ),
             ],
           ),
         ),
       );
     }
-    
+
     return url.contains("zoom")
         ? ZoomRecordingWebView(zoomUrl: url)
         : MouseRegion(
@@ -240,7 +233,10 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
               ),
               const Spacer(),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFF289F91).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20),
@@ -276,19 +272,16 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
               height: 1.6,
             ),
           ),
-          if (lesson.learningObjectives != null && 
+          if (lesson.learningObjectives != null &&
               lesson.learningObjectives!.isNotEmpty) ...[
             const SizedBox(height: 24),
             const Text(
               'Learning Objectives',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
-            ...lesson.learningObjectives!.map((objective) => 
-              Padding(
+            ...lesson.learningObjectives!.map(
+              (objective) => Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -350,10 +343,7 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
                 padding: const EdgeInsets.all(16),
                 child: Text(
                   'No resources available',
-                  style: TextStyle(
-                    color: Colors.grey.shade500,
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
                 ),
               ),
             )
@@ -466,7 +456,7 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final isNarrow = constraints.maxWidth < 600;
-          
+
           if (isNarrow) {
             return Column(
               children: [
@@ -544,7 +534,7 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
               ],
             );
           }
-          
+
           return Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -680,19 +670,12 @@ class _DownloadItem extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.grey.shade600,
-                    ),
+                    style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
                   ),
                 ],
               ),
             ),
-            Icon(
-              Icons.download,
-              size: 20,
-              color: Colors.grey.shade600,
-            ),
+            Icon(Icons.download, size: 20, color: Colors.grey.shade600),
           ],
         ),
       ),

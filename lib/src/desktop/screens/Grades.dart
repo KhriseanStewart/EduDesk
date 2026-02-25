@@ -1,37 +1,68 @@
-// lib/src/screens/GradesScreen.dart
-
 import 'package:flutter/material.dart';
 import 'package:mac_app/src/desktop/LMS%20models/lms_models.dart';
-import 'package:mac_app/src/desktop/data/mockData.dart';
+import 'package:mac_app/src/services/supabase_service.dart';
+import 'package:mac_app/src/utils/responsive.dart';
 
-class GradesScreen extends StatelessWidget {
+class GradesScreen extends StatefulWidget {
   const GradesScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final grades = MockData.grades;
-    final completedGrades = grades.where((g) => g.isPassed).toList();
-    final totalCredits = completedGrades.fold<double>(0, (sum, g) => sum + g.credits);
-    final gpa = _calculateGPA(completedGrades);
+  State<GradesScreen> createState() => _GradesScreenState();
+}
 
+class _GradesScreenState extends State<GradesScreen> {
+  final SupabaseService _supabaseService = SupabaseService();
+  late Future<List<Grade>> _gradesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _gradesFuture = _supabaseService.getGrades();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(color: Colors.white.withOpacity(0.7)),
       child: Column(
         children: [
-          _buildHeader(),
+          _buildHeader(context),
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildStatsCards(gpa, totalCredits, completedGrades.length, grades.length),
-                  const SizedBox(height: 24),
-                  _buildGradesTable(grades),
-                  const SizedBox(height: 24),
-                  _buildPerformanceChart(),
-                ],
-              ),
+            child: FutureBuilder<List<Grade>>(
+              future: _gradesFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text("Error: ${snapshot.error}"));
+                }
+
+                final grades = snapshot.data ?? [];
+                final completedGrades = grades.where((g) => g.isPassed).toList();
+                final totalCredits = completedGrades.fold<double>(0, (sum, g) => sum + g.credits);
+                final gpa = _calculateGPA(completedGrades);
+
+                final padding = context.responsivePadding;
+                final maxWidth = context.contentMaxWidth;
+                return SingleChildScrollView(
+                  padding: EdgeInsets.all(padding),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxWidth: maxWidth),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _buildStatsCards(gpa, totalCredits, completedGrades.length, grades.length),
+                          const SizedBox(height: 24),
+                          _buildGradesTable(grades),
+                          const SizedBox(height: 24),
+                          _buildPerformanceChart(),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ],
@@ -39,24 +70,27 @@ class GradesScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
+    final padding = context.responsivePadding;
+    final useMobileShell = context.useMobileShell;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+      padding: EdgeInsets.symmetric(horizontal: padding, vertical: useMobileShell ? 10 : 14),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
       ),
       child: Row(
         children: [
-          const Text(
-            "Grades & Transcript",
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
-          ),
+          if (!useMobileShell)
+            const Text(
+              "Grades & Transcript",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+            ),
           const Spacer(),
           ElevatedButton.icon(
             onPressed: () {},
-            icon: const Icon(Icons.download),
-            label: const Text("Download Transcript"),
+            icon: const Icon(Icons.download, size: 20),
+            label: Text(useMobileShell ? "Download" : "Download Transcript"),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF4DA3B6),
               foregroundColor: Colors.white,
@@ -68,43 +102,61 @@ class GradesScreen extends StatelessWidget {
   }
 
   Widget _buildStatsCards(double gpa, double credits, int passed, int total) {
-    return GridView.count(
-      crossAxisCount: 4,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 16,
-      crossAxisSpacing: 16,
-      childAspectRatio: 2,
-      children: [
-        _StatCard(
-          title: "Cumulative GPA",
-          value: gpa.toStringAsFixed(2),
-          subtitle: "Out of 4.0",
-          color: const Color(0xFF4DA3B6),
-        ),
-        _StatCard(
-          title: "Credits Earned",
-          value: credits.toStringAsFixed(1),
-          subtitle: "${(credits / 60 * 100).toInt()}% of program",
-          color: Colors.green,
-        ),
-        _StatCard(
-          title: "Courses Passed",
-          value: "$passed / $total",
-          subtitle: "Total courses",
-          color: Colors.orange,
-        ),
-        _StatCard(
-          title: "Current Term",
-          value: "Fall 2024",
-          subtitle: "Active semester",
-          color: Colors.purple,
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        int crossAxisCount = constraints.maxWidth > 800 ? 4 : 2;
+        return GridView.count(
+          crossAxisCount: crossAxisCount,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          mainAxisSpacing: 16,
+          crossAxisSpacing: 16,
+          childAspectRatio: 2,
+          children: [
+            _StatCard(
+              title: "Cumulative GPA",
+              value: gpa.toStringAsFixed(2),
+              subtitle: "Out of 4.0",
+              color: const Color(0xFF4DA3B6),
+            ),
+            _StatCard(
+              title: "Credits Earned",
+              value: credits.toStringAsFixed(1),
+              subtitle: "${(credits / 60 * 100).toInt()}% of program",
+              color: Colors.green,
+            ),
+            _StatCard(
+              title: "Courses Passed",
+              value: "$passed / $total",
+              subtitle: "Total courses",
+              color: Colors.orange,
+            ),
+            _StatCard(
+              title: "Current Term",
+              value: "Fall 2024",
+              subtitle: "Active semester",
+              color: Colors.purple,
+            ),
+          ],
+        );
+      },
     );
   }
 
   Widget _buildGradesTable(List<Grade> grades) {
+    if (grades.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.grey.shade200),
+        ),
+        child: const Center(
+          child: Text("No grades available to display."),
+        ),
+      );
+    }
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -173,7 +225,7 @@ class GradesScreen extends StatelessWidget {
     double totalCredits = 0;
     
     for (var grade in grades) {
-      if (grade.numericGrade != null) {
+      if (grade.numericGrade != null || grade.letterGrade != '--') {
         final gradePoint = _gradeToPoint(grade.letterGrade);
         totalPoints += gradePoint * grade.credits;
         totalCredits += grade.credits;

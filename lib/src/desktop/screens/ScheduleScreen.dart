@@ -1,8 +1,7 @@
-// lib/src/screens/ScheduleScreen.dart
-
 import 'package:flutter/material.dart';
 import 'package:mac_app/src/desktop/LMS%20models/lms_models.dart';
-import 'package:mac_app/src/desktop/data/mockData.dart';
+import 'package:mac_app/src/services/supabase_service.dart';
+import 'package:mac_app/src/utils/responsive.dart';
 
 class ScheduleScreen extends StatefulWidget {
   const ScheduleScreen({Key? key}) : super(key: key);
@@ -12,8 +11,17 @@ class ScheduleScreen extends StatefulWidget {
 }
 
 class _ScheduleScreenState extends State<ScheduleScreen> {
+  final SupabaseService _supabaseService = SupabaseService();
+  late Future<List<ScheduleEvent>> _scheduleFuture;
+
   DateTime selectedDate = DateTime.now();
   String viewMode = 'week'; // 'day', 'week', 'month'
+
+  @override
+  void initState() {
+    super.initState();
+    _scheduleFuture = _supabaseService.getScheduleEvents();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,20 +29,34 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       decoration: BoxDecoration(color: Colors.white.withOpacity(0.7)),
       child: Column(
         children: [
-          _buildHeader(),
+          _buildHeader(context),
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildDateSelector(),
-                  const SizedBox(height: 24),
-                  _buildScheduleGrid(),
-                  const SizedBox(height: 32),
-                  _buildUpcomingEvents(),
-                ],
-              ),
+            child: FutureBuilder<List<ScheduleEvent>>(
+              future: _scheduleFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text("Error: ${snapshot.error}"));
+                }
+
+                final events = snapshot.data ?? [];
+
+                final padding = context.responsivePadding;
+                return SingleChildScrollView(
+                  padding: EdgeInsets.all(padding),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildDateSelector(),
+                      const SizedBox(height: 24),
+                      _buildScheduleGrid(events),
+                      const SizedBox(height: 32),
+                      _buildUpcomingEvents(events),
+                    ],
+                  ),
+                );
+              },
             ),
           ),
         ],
@@ -42,32 +64,60 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
+    final padding = context.responsivePadding;
+    final useMobileShell = context.useMobileShell;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+      padding: EdgeInsets.symmetric(
+        horizontal: padding,
+        vertical: useMobileShell ? 10 : 14,
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
       ),
       child: Row(
         children: [
-          const Text(
-            "Schedule",
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+          if (!useMobileShell)
+            const Text(
+              "Schedule",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+            ),
+          if (!useMobileShell) const Spacer(),
+          Expanded(
+            child: useMobileShell
+                ? SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: SegmentedButton<String>(
+                      segments: const [
+                        ButtonSegment(value: 'day', label: Text('Day')),
+                        ButtonSegment(value: 'week', label: Text('Week')),
+                        ButtonSegment(value: 'month', label: Text('Month')),
+                      ],
+                      selected: {viewMode},
+                      onSelectionChanged: (Set<String> newSelection) {
+                        setState(() => viewMode = newSelection.first);
+                      },
+                    ),
+                  )
+                : Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SegmentedButton<String>(
+                        segments: const [
+                          ButtonSegment(value: 'day', label: Text('Day')),
+                          ButtonSegment(value: 'week', label: Text('Week')),
+                          ButtonSegment(value: 'month', label: Text('Month')),
+                        ],
+                        selected: {viewMode},
+                        onSelectionChanged: (Set<String> newSelection) {
+                          setState(() => viewMode = newSelection.first);
+                        },
+                      ),
+                      const SizedBox(width: 16),
+                    ],
+                  ),
           ),
-          const Spacer(),
-          SegmentedButton<String>(
-            segments: const [
-              ButtonSegment(value: 'day', label: Text('Day')),
-              ButtonSegment(value: 'week', label: Text('Week')),
-              ButtonSegment(value: 'month', label: Text('Month')),
-            ],
-            selected: {viewMode},
-            onSelectionChanged: (Set<String> newSelection) {
-              setState(() => viewMode = newSelection.first);
-            },
-          ),
-          const SizedBox(width: 16),
           ElevatedButton.icon(
             onPressed: () {},
             icon: const Icon(Icons.add, size: 18),
@@ -115,10 +165,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 const SizedBox(height: 4),
                 Text(
                   _getWeekRange(selectedDate),
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey.shade600,
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
                 ),
               ],
             ),
@@ -137,7 +184,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     );
   }
 
-  Widget _buildScheduleGrid() {
+  Widget _buildScheduleGrid(List<ScheduleEvent> events) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -148,15 +195,17 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         children: [
           _buildWeekDayHeaders(),
           const Divider(height: 1),
-          _buildTimeSlots(),
+          _buildTimeSlots(events),
         ],
       ),
     );
   }
 
   Widget _buildWeekDayHeaders() {
-    final weekStart = selectedDate.subtract(Duration(days: selectedDate.weekday - 1));
-    
+    final weekStart = selectedDate.subtract(
+      Duration(days: selectedDate.weekday - 1),
+    );
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       child: Row(
@@ -174,9 +223,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           ),
           ...List.generate(5, (index) {
             final day = weekStart.add(Duration(days: index));
-            final isToday = day.day == DateTime.now().day &&
+            final isToday =
+                day.day == DateTime.now().day &&
                 day.month == DateTime.now().month;
-            
+
             return Expanded(
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 8),
@@ -217,7 +267,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     );
   }
 
-  Widget _buildTimeSlots() {
+  Widget _buildTimeSlots(List<ScheduleEvent> events) {
     return SizedBox(
       height: 600,
       child: ListView.builder(
@@ -227,9 +277,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           return Container(
             height: 80,
             decoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(color: Colors.grey.shade200),
-              ),
+              border: Border(top: BorderSide(color: Colors.grey.shade200)),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -248,7 +296,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                   ),
                 ),
                 ...List.generate(5, (dayIndex) {
-                  final event = _getEventForSlot(hour, dayIndex);
+                  final event = _getEventForSlot(events, hour, dayIndex);
                   return Expanded(
                     child: event != null
                         ? _buildEventCard(event)
@@ -291,20 +339,14 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         children: [
           Text(
             event.title,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 2),
           Text(
             event.subtitle,
-            style: TextStyle(
-              fontSize: 10,
-              color: Colors.grey.shade700,
-            ),
+            style: TextStyle(fontSize: 10, color: Colors.grey.shade700),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -313,7 +355,18 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     );
   }
 
-  Widget _buildUpcomingEvents() {
+  Widget _buildUpcomingEvents(List<ScheduleEvent> events) {
+    final today = DateTime.now();
+    final upcomingEvents = events
+        .where(
+          (e) =>
+              e.startTime.isAfter(
+                DateTime(today.year, today.month, today.day),
+              ) &&
+              e.startTime.isBefore(today.add(const Duration(days: 7))),
+        )
+        .toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -322,7 +375,13 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 16),
-        ...MockData.todaySchedule.map((event) => _buildUpcomingEventCard(event)),
+        if (upcomingEvents.isEmpty)
+          const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Text("No upcoming events this week."),
+          )
+        else
+          ...upcomingEvents.map((event) => _buildUpcomingEventCard(event)),
       ],
     );
   }
@@ -357,10 +416,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 ),
                 Text(
                   _getMonthShort(event.startTime.month),
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey.shade600,
-                  ),
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                 ),
               ],
             ),
@@ -380,18 +436,32 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Icon(Icons.access_time, size: 14, color: Colors.grey.shade600),
+                    Icon(
+                      Icons.access_time,
+                      size: 14,
+                      color: Colors.grey.shade600,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       event.timeRange,
-                      style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey.shade600,
+                      ),
                     ),
                     const SizedBox(width: 16),
-                    Icon(Icons.location_on, size: 14, color: Colors.grey.shade600),
+                    Icon(
+                      Icons.location_on,
+                      size: 14,
+                      color: Colors.grey.shade600,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       event.location,
-                      style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey.shade600,
+                      ),
                     ),
                   ],
                 ),
@@ -412,12 +482,22 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     );
   }
 
-  ScheduleEvent? _getEventForSlot(int hour, int dayIndex) {
-    // For demo, only show events for today
-    if (dayIndex != DateTime.now().weekday - 1) return null;
-    
-    for (var event in MockData.todaySchedule) {
-      if (event.startTime.hour == hour) {
+  ScheduleEvent? _getEventForSlot(
+    List<ScheduleEvent> events,
+    int hour,
+    int dayIndex,
+  ) {
+    // Only show events for current days relative to selectedDate
+    final weekStart = selectedDate.subtract(
+      Duration(days: selectedDate.weekday - 1),
+    );
+    final slotDate = weekStart.add(Duration(days: dayIndex));
+
+    for (var event in events) {
+      if (event.startTime.year == slotDate.year &&
+          event.startTime.month == slotDate.month &&
+          event.startTime.day == slotDate.day &&
+          event.startTime.hour == hour) {
         return event;
       }
     }
@@ -426,8 +506,18 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   String _getMonthYear(DateTime date) {
     const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
     ];
     return "${months[date.month - 1]} ${date.year}";
   }
@@ -444,8 +534,20 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   }
 
   String _getMonthShort(int month) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return months[month - 1];
   }
 }

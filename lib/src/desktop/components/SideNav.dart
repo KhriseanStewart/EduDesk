@@ -152,7 +152,7 @@ class SideNav extends StatelessWidget {
             ),
           )
         : Container(
-            width: 128,
+            width: 80,
             height: double.infinity,
             decoration: BoxDecoration(
               color: isDark ? const Color(0xFF111827) : Colors.white,
@@ -313,15 +313,17 @@ class _NavItemState extends State<_NavItem> {
             child: Row(
               children: [
                 Icon(widget.icon, size: 24, color: textColor),
-                const SizedBox(width: 12),
-                Text(
-                  widget.label ?? '',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: textColor,
+                if (widget.label != null) ...[
+                  const SizedBox(width: 12),
+                  Text(
+                    widget.label!,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: textColor,
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           ),

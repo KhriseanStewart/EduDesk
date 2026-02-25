@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mac_app/src/desktop/LMS%20models/lms_models.dart';
+import 'dart:io';
 import 'package:mac_app/src/desktop/components/RouteName.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:mac_app/src/services/supabase_service.dart';
 
 class AssignmentSubmissionScreen extends StatefulWidget {
   final VoidCallback onNext;
@@ -26,8 +28,10 @@ class AssignmentSubmissionScreen extends StatefulWidget {
 class _AssignmentSubmissionScreenState
     extends State<AssignmentSubmissionScreen> {
   final TextEditingController _commentsController = TextEditingController();
+  final SupabaseService _supabaseService = SupabaseService();
   final List<UploadedFile> _uploadedFiles = [];
   bool _isUploading = false;
+  bool _isSubmitting = false;
   double _uploadProgress = 0.0;
 
   @override
@@ -67,6 +71,7 @@ class _AssignmentSubmissionScreenState
             name: file.name,
             size: _formatBytes(file.size),
             progress: 1.0,
+            path: file.path ?? '',
           ));
         }
         _isUploading = false;
@@ -122,24 +127,53 @@ class _AssignmentSubmissionScreenState
     );
 
     if (confirmed == true) {
-      // Simulate submission
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: const [
-              Icon(Icons.check_circle, color: Colors.white),
-              SizedBox(width: 12),
-              Text('Assignment submitted successfully!'),
-            ],
-          ),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-
       setState(() {
-        widget.assignment.isSubmitted = true;
+        _isSubmitting = true;
       });
+
+      try {
+        // Submit all selected files (SupabaseService submitAssignment supports 1 file currently, 
+        // we'll loop or modify. Actually the service takes 1 file. Let's do a loop)
+        for (var f in _uploadedFiles) {
+          if (f.path.isNotEmpty) {
+            await _supabaseService.submitAssignment(
+              assignmentId: widget.assignment.id,
+              studentId: "1", // Hardcoded student for now
+              enrollmentId: "1", // Hardcoded enrollment
+              file: File(f.path),
+            );
+          }
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: const [
+                Icon(Icons.check_circle, color: Colors.white),
+                SizedBox(width: 12),
+                Text('Assignment submitted successfully!'),
+              ],
+            ),
+            backgroundColor: Colors.green,
+            // behavior: SnackBarBehavior.floating,
+          ),
+        );
+
+        setState(() {
+          widget.assignment.isSubmitted = true;
+          _isSubmitting = false;
+        });
+      } catch (e) {
+        setState(() {
+          _isSubmitting = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error submitting assignment: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -154,7 +188,7 @@ class _AssignmentSubmissionScreenState
           ],
         ),
         backgroundColor: Colors.blue,
-        behavior: SnackBarBehavior.floating,
+        // behavior: SnackBarBehavior.floating,
       ),
     );
   }
@@ -184,7 +218,7 @@ class _AssignmentSubmissionScreenState
                         commentsController: _commentsController,
                         onPickFiles: _pickFiles,
                         onRemoveFile: _removeFile,
-                        onSubmit: _submitAssignment,
+                        onSubmit: _isSubmitting ? () {} : _submitAssignment,
                         onSaveDraft: _saveDraft,
                       )),
                       const SizedBox(width: 32),
@@ -209,7 +243,7 @@ class _AssignmentSubmissionScreenState
                         commentsController: _commentsController,
                         onPickFiles: _pickFiles,
                         onRemoveFile: _removeFile,
-                        onSubmit: _submitAssignment,
+                        onSubmit: _isSubmitting ? () {} : _submitAssignment,
                         onSaveDraft: _saveDraft,
                       ),
                       const SizedBox(height: 24),
@@ -234,11 +268,13 @@ class UploadedFile {
   final String name;
   final String size;
   final double progress;
+  final String path;
 
   UploadedFile({
     required this.name,
     required this.size,
     required this.progress,
+    required this.path,
   });
 }
 

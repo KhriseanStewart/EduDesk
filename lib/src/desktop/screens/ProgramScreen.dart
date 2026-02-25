@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mac_app/src/desktop/LMS%20models/lms_models.dart';
 import 'package:mac_app/src/desktop/components/Header.dart';
-import 'package:mac_app/src/desktop/data/mockData.dart';
+import 'package:mac_app/src/services/supabase_service.dart';
 import 'package:mac_app/src/desktop/sub-screens/main/SubLayout.dart';
+import 'package:mac_app/src/utils/responsive.dart';
 
 class ProgramScreen extends StatefulWidget {
   const ProgramScreen({Key? key}) : super(key: key);
@@ -12,34 +13,58 @@ class ProgramScreen extends StatefulWidget {
 }
 
 class _ProgramScreenState extends State<ProgramScreen> {
+  final SupabaseService _supabaseService = SupabaseService();
+  late Future<List<Course>> _coursesFuture;
+
   String selectedFilter = 'all';
   String sortBy = 'recent';
 
   @override
-  Widget build(BuildContext context) {
-    final filteredCourses = _getFilteredCourses();
-    final sortedCourses = _getSortedCourses(filteredCourses);
+  void initState() {
+    super.initState();
+    _coursesFuture = _supabaseService.getCourses();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(color: Colors.white.withOpacity(0.7)),
       child: Column(
         children: [
           Header(title: "My Courses"),
           Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildFilterBar(),
-                    const SizedBox(height: 24),
-                    _buildCourseGrid(sortedCourses),
-                    const SizedBox(height: 32),
-                    _buildLearningStats(),
-                  ],
-                ),
-              ),
+            child: FutureBuilder<List<Course>>(
+              future: _coursesFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text("Error: ${snapshot.error}"));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No courses found.'));
+                }
+
+                final courses = snapshot.data!;
+                final filteredCourses = _getFilteredCourses(courses);
+                final sortedCourses = _getSortedCourses(filteredCourses);
+
+                final padding = context.responsivePadding;
+                return SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.all(padding),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildFilterBar(courses),
+                        const SizedBox(height: 24),
+                        _buildCourseGrid(sortedCourses),
+                        const SizedBox(height: 32),
+                        _buildLearningStats(courses),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ],
@@ -47,18 +72,18 @@ class _ProgramScreenState extends State<ProgramScreen> {
     );
   }
 
-  List<Course> _getFilteredCourses() {
+  List<Course> _getFilteredCourses(List<Course> allCourses) {
     switch (selectedFilter) {
       case 'inProgress':
-        return MockData.courses
+        return allCourses
             .where((c) => c.progress > 0 && c.progress < 1.0)
             .toList();
       case 'completed':
-        return MockData.courses.where((c) => c.progress >= 1.0).toList();
+        return allCourses.where((c) => c.progress >= 1.0).toList();
       case 'upcoming':
-        return MockData.courses.where((c) => c.progress == 0).toList();
+        return allCourses.where((c) => c.progress == 0).toList();
       default:
-        return MockData.courses;
+        return allCourses;
     }
   }
 
@@ -78,7 +103,7 @@ class _ProgramScreenState extends State<ProgramScreen> {
     return sorted;
   }
 
-  Widget _buildFilterBar() {
+  Widget _buildFilterBar(List<Course> allCourses) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isWide = constraints.maxWidth > 768;
@@ -88,7 +113,7 @@ class _ProgramScreenState extends State<ProgramScreen> {
           runSpacing: 16,
           alignment: isWide ? WrapAlignment.spaceBetween : WrapAlignment.start,
           children: [
-            _buildFilterButtons(),
+            _buildFilterButtons(allCourses),
             if (isWide) _buildSortDropdown(),
           ],
         );
@@ -96,7 +121,7 @@ class _ProgramScreenState extends State<ProgramScreen> {
     );
   }
 
-  Widget _buildFilterButtons() {
+  Widget _buildFilterButtons(List<Course> allCourses) {
     return Container(
       padding: const EdgeInsets.all(4.0),
       decoration: BoxDecoration(
@@ -109,14 +134,14 @@ class _ProgramScreenState extends State<ProgramScreen> {
           _FilterButton(
             label: "All",
             isSelected: selectedFilter == 'all',
-            count: MockData.courses.length,
+            count: allCourses.length,
             onTap: () => setState(() => selectedFilter = 'all'),
           ),
           const SizedBox(width: 4),
           _FilterButton(
             label: "In Progress",
             isSelected: selectedFilter == 'inProgress',
-            count: MockData.courses
+            count: allCourses
                 .where((c) => c.progress > 0 && c.progress < 1.0)
                 .length,
             onTap: () => setState(() => selectedFilter = 'inProgress'),
@@ -125,14 +150,14 @@ class _ProgramScreenState extends State<ProgramScreen> {
           _FilterButton(
             label: "Completed",
             isSelected: selectedFilter == 'completed',
-            count: MockData.courses.where((c) => c.progress >= 1.0).length,
+            count: allCourses.where((c) => c.progress >= 1.0).length,
             onTap: () => setState(() => selectedFilter = 'completed'),
           ),
           const SizedBox(width: 4),
           _FilterButton(
             label: "Upcoming",
             isSelected: selectedFilter == 'upcoming',
-            count: MockData.courses.where((c) => c.progress == 0).length,
+            count: allCourses.where((c) => c.progress == 0).length,
             onTap: () => setState(() => selectedFilter = 'upcoming'),
           ),
         ],
@@ -197,20 +222,17 @@ class _ProgramScreenState extends State<ProgramScreen> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        int crossAxisCount = 1;
-        if (constraints.maxWidth > 1200) {
-          crossAxisCount = 3;
-        } else if (constraints.maxWidth > 768) {
-          crossAxisCount = 2;
-        }
+        final w = constraints.maxWidth;
+        final crossAxisCount = w >= Breakpoint.wide
+            ? 3
+            : (w >= Breakpoint.large ? 2 : (w > Breakpoint.compact ? 2 : 1));
 
         return GridView.builder(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            mainAxisExtent: 540,
+            mainAxisExtent: (w >= Breakpoint.wide ? 500 : 520).toDouble(),
             crossAxisCount: crossAxisCount,
             crossAxisSpacing: 20,
             mainAxisSpacing: 20,
-            childAspectRatio: 0.75,
           ),
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -247,19 +269,17 @@ class _ProgramScreenState extends State<ProgramScreen> {
     );
   }
 
-  Widget _buildLearningStats() {
-    final totalCourses = MockData.courses.length;
-    final inProgressCourses = MockData.courses
+  Widget _buildLearningStats(List<Course> allCourses) {
+    final totalCourses = allCourses.length;
+    final inProgressCourses = allCourses
         .where((c) => c.progress > 0 && c.progress < 1.0)
         .length;
-    final completedCourses = MockData.courses
-        .where((c) => c.progress >= 1.0)
-        .length;
-    final totalAssignments = MockData.courses.fold<int>(
+    final completedCourses = allCourses.where((c) => c.progress >= 1.0).length;
+    final totalAssignments = allCourses.fold<int>(
       0,
       (sum, c) => sum + c.assignments.length,
     );
-    final dueAssignments = MockData.courses
+    final dueAssignments = allCourses
         .expand((c) => c.assignments)
         .where((a) => (a.isSubmitted != true) && (a.isOverdue != true))
         .length;
@@ -447,6 +467,74 @@ class _FilterButton extends StatelessWidget {
   }
 }
 
+class _StatCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+
+  const _StatCard({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: 24),
+          ),
+          const SizedBox(width: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _CourseCard extends StatefulWidget {
   final Course course;
 
@@ -462,9 +550,7 @@ class _CourseCardState extends State<_CourseCard> {
   @override
   Widget build(BuildContext context) {
     final pendingAssignments = widget.course.assignments
-        .where((a) =>
-            (a.isSubmitted != true) &&
-            (a.isOverdue != true))
+        .where((a) => (a.isSubmitted != true) && (a.isOverdue != true))
         .length;
     final overdueAssignments = widget.course.assignments
         .where((a) => a.isOverdue == true)
@@ -522,7 +608,9 @@ class _CourseCardState extends State<_CourseCard> {
                     child: AspectRatio(
                       aspectRatio: 16 / 9,
                       child: Image.network(
-                        widget.course.imageUrl,
+                        widget.course.imageUrl.isEmpty
+                            ? "https://via.placeholder.com/150"
+                            : widget.course.imageUrl,
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) => Container(
                           color: Colors.grey.shade200,
@@ -602,10 +690,11 @@ class _CourseCardState extends State<_CourseCard> {
               ),
               // Content
               Expanded(
-                child: Padding(
+                child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         widget.course.title,
@@ -672,7 +761,7 @@ class _CourseCardState extends State<_CourseCard> {
                           ),
                         ],
                       ),
-                      const Spacer(),
+                      const SizedBox(height: 8),
                       // Progress
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -707,7 +796,7 @@ class _CourseCardState extends State<_CourseCard> {
                       ),
                       const SizedBox(height: 12),
                       // Assignments Info
-                      if (pendingAssignments > 0 || overdueAssignments > 0)
+                      if (pendingAssignments > 0 || overdueAssignments > 0) ...[
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
@@ -742,6 +831,7 @@ class _CourseCardState extends State<_CourseCard> {
                             ],
                           ),
                         ),
+                      ],
                       const SizedBox(height: 12),
                       // Action Button
                       SizedBox(
@@ -794,52 +884,6 @@ class _CourseCardState extends State<_CourseCard> {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _StatCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-  final Color color;
-
-  const _StatCard({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 32),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-            textAlign: TextAlign.center,
-          ),
-        ],
       ),
     );
   }

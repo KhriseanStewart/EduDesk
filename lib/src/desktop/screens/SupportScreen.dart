@@ -1,6 +1,7 @@
 // lib/src/screens/SupportScreen.dart
 
 import 'package:flutter/material.dart';
+import 'package:mac_app/src/utils/responsive.dart';
 
 class SupportScreen extends StatefulWidget {
   const SupportScreen({Key? key}) : super(key: key);
@@ -20,46 +21,66 @@ class _SupportScreenState extends State<SupportScreen> {
       decoration: BoxDecoration(color: Colors.white.withOpacity(0.7)),
       child: Column(
         children: [
-          _buildHeader(),
+          _buildHeader(context),
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      children: [
-                        _buildQuickActions(),
-                        const SizedBox(height: 24),
-                        _buildSupportTicketForm(),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 24),
-                  Expanded(
-                    flex: 1,
-                    child: Column(
-                      children: [
-                        _buildContactInfo(),
-                        const SizedBox(height: 24),
-                        _buildFAQSection(),
-                      ],
-                    ),
-                  ),
-                ],
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final padding = context.responsivePadding;
+                final useColumn = context.isCompact || constraints.maxWidth < Breakpoint.medium;
+                return SingleChildScrollView(
+                  padding: EdgeInsets.all(padding),
+                  child: useColumn
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _buildQuickActions(),
+                            const SizedBox(height: 24),
+                            _buildSupportTicketForm(),
+                            const SizedBox(height: 24),
+                            _buildContactInfo(),
+                            const SizedBox(height: 24),
+                            _buildFAQSection(),
+                          ],
+                        )
+                      : Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              flex: 2,
+                              child: Column(
+                                children: [
+                                  _buildQuickActions(),
+                                  const SizedBox(height: 24),
+                                  _buildSupportTicketForm(),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 24),
+                            Expanded(
+                              flex: 1,
+                              child: Column(
+                                children: [
+                                  _buildContactInfo(),
+                                  const SizedBox(height: 24),
+                                  _buildFAQSection(),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                );
+                  },
+                ),
               ),
-            ),
-          ),
-        ],
-      ),
+          ],
+        ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
+    final padding = context.responsivePadding;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+      padding: EdgeInsets.symmetric(horizontal: padding, vertical: 14),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(bottom: BorderSide(color: Colors.grey.shade200)),

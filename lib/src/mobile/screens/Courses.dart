@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mac_app/src/desktop/LMS%20models/lms_models.dart';
-import 'package:mac_app/src/desktop/data/mockData.dart';
 import 'package:mac_app/src/mobile/main/SubLayout.dart';
+import 'package:mac_app/src/services/supabase_service.dart';
+import 'package:mac_app/src/utils/responsive.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CourseScreen extends StatefulWidget {
   const CourseScreen({super.key});
@@ -11,7 +13,27 @@ class CourseScreen extends StatefulWidget {
 }
 
 class _CourseScreenState extends State<CourseScreen> {
+  final SupabaseService _supabase = SupabaseService();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  late Future<List<Course>> _coursesFuture;
+
   String selectedFilter = 'all';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCourses();
+  }
+
+  void _loadCourses() {
+    final userId = Supabase.instance.client.auth.currentUser?.id;
+    setState(() {
+      _coursesFuture = userId != null
+          ? _supabase.getEnrolledCourses(userId)
+          : _supabase.getCourses();
+    });
+  }
+
   String _filterLabel(String value) {
     switch (value) {
       case 'inProgress':
@@ -25,86 +47,294 @@ class _CourseScreenState extends State<CourseScreen> {
     }
   }
 
+  List<Course> _getFilteredCourses(List<Course> allCourses) {
+    switch (selectedFilter) {
+      case 'inProgress':
+        return allCourses
+            .where((c) => c.progress > 0 && c.progress < 1.0)
+            .toList();
+      case 'completed':
+        return allCourses.where((c) => c.progress >= 1.0).toList();
+      case 'upcoming':
+        return allCourses.where((c) => c.progress == 0).toList();
+      default:
+        return allCourses;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20.0,
-              vertical: 6.0,
-            ),
-            child: _buildHeaderSection(context),
-          ),
-          const SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [_buildMobileFilterTrigger()],
-            ),
-          ),
-          const SizedBox(height: 10),
-          Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 14.0),
-              shrinkWrap: true,
-              // physics: const NeverScrollableScrollPhysics(),
-              itemCount: MockData.courses.length,
-              itemBuilder: (BuildContext context, int index) {
-                final course = MockData.courses[index];
-                return _CourseCard(course: course);
-              },
-              separatorBuilder: (context, index) =>
-                  const SizedBox(height: 18.0),
-            ),
+    final padding = context.responsivePadding;
+    return Scaffold(
+      key: _scaffoldKey,
+      appBar: AppBar(
+        title: const Text('My Courses', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
+        centerTitle: false,
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF0F181A),
+        elevation: 0,
+        scrolledUnderElevation: 1,
+        leading: IconButton(
+          icon: const Icon(Icons.menu_rounded),
+          onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add_circle_outline_rounded),
+            onPressed: _showJoinClassDialog,
+            tooltip: 'Join class',
           ),
         ],
+      ),
+      drawer: _buildDrawer(context),
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: padding),
+          child: FutureBuilder<List<Course>>(
+            future: _coursesFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.hasError) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Error: ${snapshot.error}', textAlign: TextAlign.center),
+                      const SizedBox(height: 16),
+                      ElevatedButton(onPressed: _loadCourses, child: const Text('Retry')),
+                    ],
+                  ),
+                );
+              }
+              final allCourses = snapshot.data ?? [];
+              final filteredCourses = _getFilteredCourses(allCourses);
+
+              if (allCourses.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.menu_book_rounded, size: 64, color: Colors.grey.shade400),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No courses yet',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Tap + to join a class with a course code',
+                        style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      FilledButton.icon(
+                        onPressed: _showJoinClassDialog,
+                        icon: const Icon(Icons.add_rounded),
+                        label: const Text('Join class'),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: const Color(0xFF4DA3B6),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [_buildMobileFilterTrigger(allCourses)],
+                  ),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: ListView.separated(
+                      padding: const EdgeInsets.only(bottom: 24),
+                      itemCount: filteredCourses.length,
+                      itemBuilder: (context, index) {
+                        final course = filteredCourses[index];
+                        return _CourseCard(course: course);
+                      },
+                      separatorBuilder: (_, __) => const SizedBox(height: 16),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildHeaderSection(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          spacing: 6,
+  Widget _buildDrawer(BuildContext context) {
+    return Drawer(
+      child: SafeArea(
+        child: Column(
           children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                borderRadius: BorderRadius.circular(8),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+              child: Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF4DA3B6),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.school_rounded, color: Colors.white, size: 26),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text('EduDesk', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                ],
               ),
-              child: const Icon(Icons.school, color: Colors.white, size: 24),
             ),
-            Text(
-              'EduDesk',
-              style: TextStyle(
-                color: const Color(0xFF0F181A),
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                height: 1,
-              ),
+            const Divider(height: 1),
+            ListTile(
+              leading: const Icon(Icons.add_rounded, color: Color(0xFF4DA3B6)),
+              title: const Text('Join class', style: TextStyle(fontWeight: FontWeight.w600)),
+              onTap: () {
+                Navigator.pop(context);
+                _showJoinClassDialog();
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.refresh_rounded, color: Colors.grey.shade700),
+              title: const Text('Refresh list'),
+              onTap: () {
+                Navigator.pop(context);
+                _loadCourses();
+              },
+            ),
+            const Divider(height: 24),
+            ListTile(
+              leading: Icon(Icons.info_outline_rounded, color: Colors.grey.shade700),
+              title: const Text('Enter a course code from your instructor to join a class.'),
+              subtitle: const Text('e.g. CS101'),
             ),
           ],
         ),
-        Row(
-          children: [
-            IconButton(onPressed: () {}, icon: Icon(Icons.search)),
-            CircleAvatar(),
-          ],
-        ),
-      ],
+      ),
     );
   }
 
-  Widget _buildMobileFilterTrigger() {
+  void _showJoinClassDialog() {
+    final codeController = TextEditingController();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                'Join a class',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Enter the course code shared by your instructor',
+                style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: codeController,
+                decoration: const InputDecoration(
+                  labelText: 'Course code',
+                  hintText: 'e.g. CS101',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.code_rounded),
+                ),
+                textCapitalization: TextCapitalization.characters,
+                onSubmitted: (_) => _submitJoinCode(ctx, codeController.text.trim()),
+              ),
+              const SizedBox(height: 24),
+              FilledButton(
+                onPressed: () => _submitJoinCode(ctx, codeController.text.trim()),
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFF4DA3B6),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text('Join class'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _submitJoinCode(BuildContext context, String code) async {
+    if (code.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a course code.')),
+      );
+      return;
+    }
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      if (context.mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please sign in to join a class.')),
+        );
+      }
+      return;
+    }
+    try {
+      final course = await _supabase.getCourseByCode(code);
+      if (!context.mounted) return;
+      if (course == null) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No course found with code "$code".')),
+        );
+        return;
+      }
+      final enrolledIds = await _supabase.getEnrolledCourseIds(user.id);
+      if (enrolledIds.contains(course.id)) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('You are already enrolled in this course.')),
+        );
+        return;
+      }
+      await _supabase.enrollStudentInCourse(courseId: course.id, studentId: user.id);
+      if (context.mounted) {
+        Navigator.pop(context);
+        _loadCourses();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Joined "${course.title}" successfully.')),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not join: $e')),
+        );
+      }
+    }
+  }
+
+  Widget _buildMobileFilterTrigger(List<Course> allCourses) {
     return InkWell(
-      onTap: _openFilterSheet,
+      onTap: () => _openFilterSheet(allCourses),
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -129,7 +359,7 @@ class _CourseScreenState extends State<CourseScreen> {
     );
   }
 
-  void _openFilterSheet() {
+  void _openFilterSheet(List<Course> allCourses) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -147,23 +377,23 @@ class _CourseScreenState extends State<CourseScreen> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
-              _buildFilterOption('all', "All", MockData.courses.length),
+              _buildFilterOption('all', "All", allCourses.length),
               _buildFilterOption(
                 'inProgress',
                 "In Progress",
-                MockData.courses
+                allCourses
                     .where((c) => c.progress > 0 && c.progress < 1.0)
                     .length,
               ),
               _buildFilterOption(
                 'completed',
                 "Completed",
-                MockData.courses.where((c) => c.progress >= 1.0).length,
+                allCourses.where((c) => c.progress >= 1.0).length,
               ),
               _buildFilterOption(
                 'upcoming',
                 "Upcoming",
-                MockData.courses.where((c) => c.progress == 0).length,
+                allCourses.where((c) => c.progress == 0).length,
               ),
               const SizedBox(height: 12),
             ],
@@ -194,16 +424,16 @@ class _CourseScreenState extends State<CourseScreen> {
       ),
       trailing: count > 0
           ? Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Text(
-                count.toString(),
-                style: const TextStyle(fontSize: 12),
-              ),
-            )
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade200,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              count.toString(),
+              style: const TextStyle(fontSize: 12),
+            ),
+          )
           : null,
     );
   }
@@ -282,11 +512,13 @@ class _CourseCardState extends State<_CourseCard> {
                     child: AspectRatio(
                       aspectRatio: 16 / 9,
                       child: Image.network(
-                        widget.course.imageUrl,
+                        widget.course.imageUrl.isEmpty 
+                            ? "https://via.placeholder.com/150" 
+                            : widget.course.imageUrl,
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) => Container(
                           color: Colors.grey.shade200,
-                          child: Icon(
+                          child: const Icon(
                             Icons.image_not_supported,
                             size: 48,
                             color: Colors.grey,
@@ -507,19 +739,19 @@ class _CourseCardState extends State<_CourseCard> {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (_) => Sublayout(),
-                          //     settings: RouteSettings(
-                          //       arguments: {
-                          //         "assignments": widget.course.assignments,
-                          //         "modules": widget.course.modules,
-                          //         "course": widget.course,
-                          //       },
-                          //     ),
-                          //   ),
-                          // );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => Sublayout(),
+                              settings: RouteSettings(
+                                arguments: {
+                                  "assignments": widget.course.assignments,
+                                  "modules": widget.course.modules,
+                                  "course": widget.course,
+                                },
+                              ),
+                            ),
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: widget.course.categoryColor,

@@ -1,57 +1,91 @@
-// lib/src/screens/Dashboard.dart - UPDATED
-
 import 'package:flutter/material.dart';
 import 'package:mac_app/src/desktop/LMS%20models/lms_models.dart';
 import 'package:mac_app/src/desktop/components/CourseCard.dart';
 import 'package:mac_app/src/desktop/components/StickySidebar.dart';
-import 'package:mac_app/src/desktop/data/mockData.dart';
+import 'package:mac_app/src/services/supabase_service.dart';
 import 'package:mac_app/src/desktop/sub-screens/main/SubLayout.dart';
+import 'package:mac_app/src/utils/responsive.dart';
 
-class Dashboard extends StatelessWidget {
+class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final activeCourses = MockData.courses.where((c) => c.isActive).toList();
-    final announcement = MockData.announcements.firstWhere((a) => a.isPinned);
+  _DashboardState createState() => _DashboardState();
+}
 
-    print(size.width);
+class _DashboardState extends State<Dashboard> {
+  final SupabaseService _supabaseService = SupabaseService();
+  late Future<List<dynamic>> _dashboardDataFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _dashboardDataFuture = Future.wait([
+      _supabaseService.getCourses(),
+      _supabaseService.getAnnouncements(),
+    ]);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final padding = context.responsivePadding;
+    final showSidebar = size.width > Breakpoint.large;
 
     return Container(
       decoration: BoxDecoration(color: Colors.white.withOpacity(0.7)),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 15.0),
-        child: Row(
-          spacing: 16,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Scrollable content area
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    size.width > 1302
-                        ? _buildAnnouncementBanner(context, announcement)
-                        : const SizedBox.shrink(),
-                    const SizedBox(height: 16),
-                    _buildCurrentCourses(context, size, activeCourses),
-                    const SizedBox(height: 24),
-                    _buildQuickStats(activeCourses),
-                  ],
+        padding: EdgeInsets.symmetric(horizontal: padding, vertical: 15),
+        child: FutureBuilder<List<dynamic>>(
+              future: _dashboardDataFuture,
+              builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error loading dashboard: ${snapshot.error}'));
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(child: Text('No data found.'));
+            }
+
+            final courses = snapshot.data![0] as List<Course>;
+            final announcements = snapshot.data![1] as List<Announcement>;
+
+            final activeCourses = courses.where((c) => c.isActive).toList();
+            final announcement = announcements.isNotEmpty 
+                ? announcements.firstWhere((a) => a.isPinned, orElse: () => announcements.first)
+                : null;
+
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Scrollable content area
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        if (showSidebar && announcement != null)
+                          _buildAnnouncementBanner(context, announcement)
+                        else
+                          const SizedBox.shrink(),
+                        const SizedBox(height: 16),
+                        _buildCurrentCourses(context, size, activeCourses),
+                        const SizedBox(height: 24),
+                        _buildQuickStats(activeCourses),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            // Fixed sticky sidebar
-            size.width > 1302
-                ? SizedBox(
-                    width: size.width * 0.3,
+                if (showSidebar) SizedBox(width: padding),
+                if (showSidebar)
+                  SizedBox(
+                    width: size.width > Breakpoint.xl ? 380 : size.width * 0.28,
                     child: const StickySidebar(),
-                  )
-                : const SizedBox.shrink(),
-          ],
-        ),
-      ),
+                  ),
+              ],
+            );
+              },
+            ),
+          ),
     );
   }
 
@@ -121,7 +155,14 @@ class Dashboard extends StatelessWidget {
     );
   }
 
-  Widget _buildCurrentCourses(BuildContext context, Size size, List courses) {
+  Widget _buildCurrentCourses(BuildContext context, Size size, List<Course> courses) {
+    if (courses.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.all(20.0),
+        child: Text("No courses available.", style: TextStyle(fontSize: 16)),
+      );
+    }
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -130,14 +171,19 @@ class Dashboard extends StatelessWidget {
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 15),
-        GridView.builder(
-          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            mainAxisExtent: 300,
-            crossAxisSpacing: 18,
-            mainAxisSpacing: 18,
-            maxCrossAxisExtent: 420,
-            childAspectRatio: size.width > 1201 ? 1 : 1.35,
-          ),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final crossCount = context.courseGridCrossCount;
+            final spacing = 18.0;
+            final availableWidth = constraints.maxWidth - (crossCount - 1) * spacing;
+            final cardWidth = availableWidth / crossCount;
+            return GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossCount,
+                mainAxisExtent: (cardWidth * 0.85).clamp(300.0, 380.0),
+                crossAxisSpacing: spacing,
+                mainAxisSpacing: spacing,
+              ),
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: courses.length,
@@ -151,16 +197,18 @@ class Dashboard extends StatelessWidget {
                     builder: (_) => Sublayout(),
                     settings: RouteSettings(
                       arguments: {
-                        "assignments": course.assignments,
-                        "modules": course.modules,
-                        "course": course,
+                         "assignments": course.assignments,
+                         "modules": course.modules,
+                         "course": course,
                       },
                     ),
                   ),
                 );
               },
               child: CourseCard(
-                imageurl: course.imageUrl,
+                imageurl: course.imageUrl.isEmpty
+                    ? "https://via.placeholder.com/150"
+                    : course.imageUrl,
                 title: course.title,
                 instructor: course.instructor,
                 progress: course.progress,
@@ -169,25 +217,27 @@ class Dashboard extends StatelessWidget {
               ),
             );
           },
+            );
+          },
         ),
       ],
     );
   }
 
-  Widget _buildQuickStats(List courses) {
+  Widget _buildQuickStats(List<Course> courses) {
     final totalModules = courses.fold<int>(
       0,
-      (int sum, c) => sum + (c.totalModules as int),
+      (int sum, c) => sum + c.totalModules,
     );
     final completedModules = courses.fold<int>(
       0,
-      (int sum, c) => sum + (c.completedModules as int),
+      (int sum, c) => sum + c.completedModules,
     );
     final avgProgress = courses.isEmpty
         ? 0.0
         : courses.fold<double>(
                 0.0,
-                (double sum, c) => sum + (c.progress as num).toDouble(),
+                (double sum, c) => sum + (c.progress),
               ) /
               courses.length;
 

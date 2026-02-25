@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mac_app/src/mobile/screens/Courses.dart';
 import 'package:mac_app/src/mobile/screens/Dashboard.dart';
+import 'package:mac_app/src/mobile/screens/Grades.dart';
+import 'package:mac_app/src/mobile/screens/Profile.dart';
 
 class MobileLayout extends StatefulWidget {
   const MobileLayout({super.key});
@@ -13,16 +15,14 @@ class _MobileLayoutState extends State<MobileLayout> {
   final List<Widget> _screens = const [
     Dashboard(),
     CourseScreen(),
-    Placeholder(),
-    Placeholder(),
+    GradesScreen(),
+    ProfileScreen(),
   ];
 
   int currentIndex = 0;
 
-  onTap(int index) {
-    setState(() {
-      currentIndex = index;
-    });
+  void _onTap(int index) {
+    setState(() => currentIndex = index);
   }
 
   @override
@@ -32,19 +32,29 @@ class _MobileLayoutState extends State<MobileLayout> {
       body: _screens[currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
-        onTap: onTap,
-        selectedItemColor: Colors.black,
+        onTap: _onTap,
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: const Color(0xFF4DA3B6),
         unselectedItemColor: Colors.grey,
         backgroundColor: Colors.white,
-        items: [
+        elevation: 8,
+        items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
+            icon: Icon(Icons.dashboard_rounded),
             label: "Dashboard",
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.book), label: "My Courses"),
-          BottomNavigationBarItem(icon: Icon(Icons.grade), label: "My Grades"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
-          // BottomNavigationBarItem(icon: Icon(Icons.book), label: "My Courses"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.menu_book_rounded),
+            label: "Courses",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.grade_rounded),
+            label: "Grades",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_rounded),
+            label: "Profile",
+          ),
         ],
       ),
     );

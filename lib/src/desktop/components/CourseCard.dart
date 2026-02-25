@@ -51,9 +51,11 @@ class _CourseCardState extends State<CourseCard> {
             ),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             // IMAGE HEADER
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
@@ -146,6 +148,7 @@ class _CourseCardState extends State<CourseCard> {
               ),
             ),
           ],
+          ),
         ),
       ),
     );

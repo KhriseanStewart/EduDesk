@@ -133,7 +133,7 @@ class _AssignmentSubmissionScreenState
             ],
           ),
           backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
+          // behavior: SnackBarBehavior.floating,
         ),
       );
 
@@ -154,7 +154,7 @@ class _AssignmentSubmissionScreenState
           ],
         ),
         backgroundColor: Colors.blue,
-        behavior: SnackBarBehavior.floating,
+        // behavior: SnackBarBehavior.floating,
       ),
     );
   }
